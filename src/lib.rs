@@ -345,6 +345,14 @@ mod tests {
     }
 
     #[test]
+    fn quick_ports_and_web_ports_are_non_empty() {
+        assert!(!QUICK_PORTS.is_empty());
+        assert!(!WEB_PORTS.is_empty());
+        assert!(QUICK_PORTS.contains(&22));
+        assert!(WEB_PORTS.contains(&80));
+    }
+
+    #[test]
     fn empty_scanner_has_zero_probes() {
         let s = Scanner::empty();
         assert!(s.is_empty());
