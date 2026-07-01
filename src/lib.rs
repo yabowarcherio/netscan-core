@@ -66,20 +66,9 @@ pub struct Scanner {
     /// The port set to try against each host.
     pub ports: PortSpec,
     /// Per-connection timeout for the TCP handshake.
-    #[cfg_attr(feature = "serde", serde(default = "default_timeout"))]
     pub timeout: Duration,
     /// Maximum concurrent connection attempts.
-    #[cfg_attr(feature = "serde", serde(default = "default_concurrency"))]
     pub concurrency: usize,
-}
-
-#[cfg(feature = "serde")]
-fn default_timeout() -> Duration {
-    DEFAULT_TIMEOUT
-}
-#[cfg(feature = "serde")]
-fn default_concurrency() -> usize {
-    DEFAULT_CONCURRENCY
 }
 
 impl Scanner {
