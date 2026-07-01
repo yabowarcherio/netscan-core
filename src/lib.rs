@@ -209,6 +209,14 @@ pub struct HostResult {
 }
 
 impl HostResult {
+    /// Construct a fresh `HostResult` with no observed open ports.
+    pub fn new(addr: IpAddr) -> Self {
+        Self {
+            addr,
+            open_ports: Vec::new(),
+        }
+    }
+
     /// A host counts as *alive* when at least one probed port responded.
     pub fn is_alive(&self) -> bool {
         !self.open_ports.is_empty()
