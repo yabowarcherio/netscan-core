@@ -82,6 +82,17 @@ impl Scanner {
         }
     }
 
+    /// Construct an empty scanner — no targets, no ports.
+    /// Equivalent to [`Scanner::default`].
+    pub fn empty() -> Self {
+        Self::default()
+    }
+
+    /// `true` when the scanner has zero probes to run.
+    pub fn is_empty(&self) -> bool {
+        self.targets.is_empty() || self.ports.is_empty()
+    }
+
     /// Override the per-connection timeout.
     pub fn with_timeout(mut self, timeout: Duration) -> Self {
         self.timeout = timeout;
@@ -301,6 +312,13 @@ mod tests {
                 "10.0.0.2:80".parse().unwrap(),
             ]
         );
+    }
+
+    #[test]
+    fn empty_scanner_has_zero_probes() {
+        let s = Scanner::empty();
+        assert!(s.is_empty());
+        assert_eq!(s.total_probes(), 0);
     }
 
     #[test]
