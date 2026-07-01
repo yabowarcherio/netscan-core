@@ -59,16 +59,27 @@ pub const QUICK_PORTS: &[u16] = &[22, 80, 443, 3389];
 pub const WEB_PORTS: &[u16] = &[80, 443, 8000, 8008, 8080, 8443, 8888];
 
 /// A single scan configuration.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct Scanner {
     /// The host targets to probe.
     pub targets: Vec<IpSet>,
     /// The port set to try against each host.
     pub ports: PortSpec,
     /// Per-connection timeout for the TCP handshake.
+    #[cfg_attr(feature = "serde", serde(default = "default_timeout"))]
     pub timeout: Duration,
     /// Maximum concurrent connection attempts.
+    #[cfg_attr(feature = "serde", serde(default = "default_concurrency"))]
     pub concurrency: usize,
+}
+
+#[cfg(feature = "serde")]
+fn default_timeout() -> Duration {
+    DEFAULT_TIMEOUT
+}
+#[cfg(feature = "serde")]
+fn default_concurrency() -> usize {
+    DEFAULT_CONCURRENCY
 }
 
 impl Scanner {
