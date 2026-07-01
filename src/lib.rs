@@ -51,6 +51,13 @@ pub const DEFAULT_TIMEOUT: Duration = Duration::from_millis(1500);
 /// Default number of in-flight connection attempts.
 pub const DEFAULT_CONCURRENCY: usize = 256;
 
+/// A curated short list of ports that a "quick scan" typically hits — SSH,
+/// HTTP, HTTPS, RDP. Matches the CLI's default `--ports` value.
+pub const QUICK_PORTS: &[u16] = &[22, 80, 443, 3389];
+
+/// The set of ports commonly enumerated as "web" services.
+pub const WEB_PORTS: &[u16] = &[80, 443, 8000, 8008, 8080, 8443, 8888];
+
 /// A single scan configuration.
 #[derive(Debug, Clone)]
 pub struct Scanner {
