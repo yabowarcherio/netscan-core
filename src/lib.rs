@@ -236,6 +236,17 @@ impl HostResult {
     }
 }
 
+/// Extract every alive host from a batch of results, borrowing them from the
+/// original slice.
+pub fn alive_hosts(results: &[HostResult]) -> impl Iterator<Item = &HostResult> {
+    results.iter().filter(|r| r.is_alive())
+}
+
+/// Count how many hosts in a batch responded on at least one port.
+pub fn alive_count(results: &[HostResult]) -> usize {
+    alive_hosts(results).count()
+}
+
 /// A [`HostResult`] plus a MAC address and (resolved) vendor. Meant for the
 /// case where a caller has an ARP table or similar side-channel mapping IPs to
 /// MACs — this crate can't discover MACs on its own without raw-socket access.
