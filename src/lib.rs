@@ -104,9 +104,10 @@ impl Scanner {
         Duration::from_secs(secs)
     }
 
-    /// Override the per-connection timeout.
+    /// Override the per-connection timeout. Values above
+    /// [`PROBE_MAX_TIMEOUT`] are silently clamped.
     pub fn with_timeout(mut self, timeout: Duration) -> Self {
-        self.timeout = timeout;
+        self.timeout = timeout.min(PROBE_MAX_TIMEOUT);
         self
     }
 
@@ -394,6 +395,12 @@ mod tests {
         let s = Scanner::empty();
         assert!(s.is_empty());
         assert_eq!(s.total_probes(), 0);
+    }
+
+    #[test]
+    fn with_timeout_clamps_to_probe_max_timeout() {
+        let s = Scanner::empty().with_timeout(Duration::from_secs(3600));
+        assert_eq!(s.timeout, PROBE_MAX_TIMEOUT);
     }
 
     #[test]
