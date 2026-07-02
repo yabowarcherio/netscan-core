@@ -289,7 +289,7 @@ pub async fn wake(mac: [u8; 6]) -> std::io::Result<()> {
 }
 
 /// The outcome of a single (address, port) probe.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ProbeStatus {
     /// TCP handshake completed within the timeout — port is open.
     Open,
@@ -298,6 +298,38 @@ pub enum ProbeStatus {
     Closed,
     /// The handshake didn't complete within the timeout.
     Filtered,
+}
+
+impl ProbeStatus {
+    /// `true` when the port is [`ProbeStatus::Open`].
+    pub fn is_open(self) -> bool {
+        matches!(self, ProbeStatus::Open)
+    }
+
+    /// `true` when the remote actively refused the connection.
+    pub fn is_closed(self) -> bool {
+        matches!(self, ProbeStatus::Closed)
+    }
+
+    /// `true` when the probe timed out or errored.
+    pub fn is_filtered(self) -> bool {
+        matches!(self, ProbeStatus::Filtered)
+    }
+
+    /// A short, allocation-free label — `"open"`, `"closed"`, or `"filtered"`.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            ProbeStatus::Open => "open",
+            ProbeStatus::Closed => "closed",
+            ProbeStatus::Filtered => "filtered",
+        }
+    }
+}
+
+impl std::fmt::Display for ProbeStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
 }
 
 /// Attempt a TCP connect to `sock` with the given `deadline`.
