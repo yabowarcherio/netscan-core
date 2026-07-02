@@ -451,6 +451,26 @@ mod tests {
     }
 
     #[tokio::test(flavor = "current_thread")]
+    async fn probe_many_preserves_input_order() {
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let open = listener.local_addr().unwrap();
+        let handle = tokio::spawn(async move {
+            let _ = listener.accept().await;
+        });
+        let closed: SocketAddr = "127.0.0.1:1".parse().unwrap();
+        let out = probe_many([
+            (open, Duration::from_millis(400)),
+            (closed, Duration::from_millis(100)),
+        ])
+        .await;
+        handle.abort();
+        assert_eq!(out.len(), 2);
+        assert_eq!(out[0].0, open);
+        assert_eq!(out[0].1, ProbeStatus::Open);
+        assert_eq!(out[1].0, closed);
+    }
+
+    #[tokio::test(flavor = "current_thread")]
     async fn probe_open_port_via_ephemeral_listener() {
         // Bind an ephemeral listener and probe it: the connect must succeed.
         let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
