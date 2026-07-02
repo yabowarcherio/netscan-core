@@ -339,8 +339,11 @@ impl std::fmt::Display for ProbeStatus {
 pub const PROBE_MAX_TIMEOUT: Duration = Duration::from_secs(120);
 
 /// Probe several `(SocketAddr, Duration)` pairs sequentially, returning each
-/// result in input order. Prefer [`Scanner::run`] or [`Scanner::stream`] when
-/// you want the probes fanned out concurrently.
+/// result in input order.
+///
+/// Prefer [`Scanner::run`] or [`Scanner::stream`] when you want the probes
+/// fanned out concurrently — this helper is only useful for tiny lists and
+/// tests where sequential timing matters.
 pub async fn probe_many(
     targets: impl IntoIterator<Item = (SocketAddr, Duration)>,
 ) -> Vec<(SocketAddr, ProbeStatus)> {
