@@ -338,12 +338,14 @@ impl std::fmt::Display for ProbeStatus {
 /// more than a couple of minutes.
 pub const PROBE_MAX_TIMEOUT: Duration = Duration::from_secs(120);
 
-/// Attempt a TCP connect to `sock` with the given `deadline`.
+/// Attempt a TCP connect to `sock` with the given `deadline`. `deadline` is
+/// clamped to [`PROBE_MAX_TIMEOUT`].
 ///
 /// Returns [`ProbeStatus::Open`] on a successful handshake,
 /// [`ProbeStatus::Closed`] on an explicit refusal (`ECONNREFUSED`), and
 /// [`ProbeStatus::Filtered`] on timeout or any other IO error.
 pub async fn probe(sock: SocketAddr, deadline: Duration) -> ProbeStatus {
+    let deadline = deadline.min(PROBE_MAX_TIMEOUT);
     match timeout(deadline, TcpStream::connect(sock)).await {
         Ok(Ok(_stream)) => ProbeStatus::Open,
         Ok(Err(e)) if e.kind() == std::io::ErrorKind::ConnectionRefused => ProbeStatus::Closed,
