@@ -338,6 +338,11 @@ impl std::fmt::Display for ProbeStatus {
 /// more than a couple of minutes.
 pub const PROBE_MAX_TIMEOUT: Duration = Duration::from_secs(120);
 
+/// Minimum probe timeout accepted by [`probe`]. Values below this are
+/// treated as this — anything shorter is a foot-gun (Linux kernels routinely
+/// round short `connect` deadlines up anyway).
+pub const PROBE_MIN_TIMEOUT: Duration = Duration::from_millis(10);
+
 /// Probe several `(SocketAddr, Duration)` pairs sequentially, returning each
 /// result in input order.
 ///
