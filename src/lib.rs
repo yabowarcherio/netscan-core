@@ -338,6 +338,19 @@ impl std::fmt::Display for ProbeStatus {
 /// more than a couple of minutes.
 pub const PROBE_MAX_TIMEOUT: Duration = Duration::from_secs(120);
 
+/// Probe several `(SocketAddr, Duration)` pairs sequentially, returning each
+/// result in input order. Prefer [`Scanner::run`] or [`Scanner::stream`] when
+/// you want the probes fanned out concurrently.
+pub async fn probe_many(
+    targets: impl IntoIterator<Item = (SocketAddr, Duration)>,
+) -> Vec<(SocketAddr, ProbeStatus)> {
+    let mut out = Vec::new();
+    for (sock, dur) in targets {
+        out.push((sock, probe(sock, dur).await));
+    }
+    out
+}
+
 /// Attempt a TCP connect to `sock` with the given `deadline`. `deadline` is
 /// clamped to [`PROBE_MAX_TIMEOUT`].
 ///
