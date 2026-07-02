@@ -332,6 +332,11 @@ impl std::fmt::Display for ProbeStatus {
     }
 }
 
+/// Maximum probe timeout accepted by [`probe`]. Longer timeouts are clamped
+/// silently — no realistic scan wants a single connect attempt to block for
+/// more than a couple of minutes.
+pub const PROBE_MAX_TIMEOUT: Duration = Duration::from_secs(120);
+
 /// Attempt a TCP connect to `sock` with the given `deadline`.
 ///
 /// Returns [`ProbeStatus::Open`] on a successful handshake,
