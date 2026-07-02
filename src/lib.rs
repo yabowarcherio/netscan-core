@@ -397,6 +397,21 @@ mod tests {
         assert_eq!(s.concurrency, 1);
     }
 
+    #[test]
+    fn probe_status_predicates() {
+        assert!(ProbeStatus::Open.is_open());
+        assert!(!ProbeStatus::Open.is_closed());
+        assert!(ProbeStatus::Closed.is_closed());
+        assert!(ProbeStatus::Filtered.is_filtered());
+    }
+
+    #[test]
+    fn probe_status_as_str_matches_display() {
+        for s in [ProbeStatus::Open, ProbeStatus::Closed, ProbeStatus::Filtered] {
+            assert_eq!(s.as_str(), s.to_string());
+        }
+    }
+
     #[tokio::test(flavor = "current_thread")]
     async fn probe_closed_port_on_localhost_is_closed_or_filtered() {
         // We can't guarantee 127.0.0.1:1 is closed on every CI image (it
