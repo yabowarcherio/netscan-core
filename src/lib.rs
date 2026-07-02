@@ -20,6 +20,8 @@ use std::time::Duration;
 
 use cidr_utils::IpSet;
 use portspec::PortSpec;
+use tokio::net::TcpStream;
+use tokio::time::timeout;
 
 pub use cidr_utils;
 pub use oui_lookup;
@@ -100,6 +102,32 @@ impl HostResult {
     }
 }
 
+/// The outcome of a single (address, port) probe.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProbeStatus {
+    /// TCP handshake completed within the timeout — port is open.
+    Open,
+    /// The remote actively refused the connection (RST). Distinguishing this
+    /// from a filtered timeout tells the caller the host is up.
+    Closed,
+    /// The handshake didn't complete within the timeout.
+    Filtered,
+}
+
+/// Attempt a TCP connect to `sock` with the given `deadline`.
+///
+/// Returns [`ProbeStatus::Open`] on a successful handshake,
+/// [`ProbeStatus::Closed`] on an explicit refusal (`ECONNREFUSED`), and
+/// [`ProbeStatus::Filtered`] on timeout or any other IO error.
+pub async fn probe(sock: SocketAddr, deadline: Duration) -> ProbeStatus {
+    match timeout(deadline, TcpStream::connect(sock)).await {
+        Ok(Ok(_stream)) => ProbeStatus::Open,
+        Ok(Err(e)) if e.kind() == std::io::ErrorKind::ConnectionRefused => ProbeStatus::Closed,
+        Ok(Err(_)) => ProbeStatus::Filtered,
+        Err(_) => ProbeStatus::Filtered,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -134,6 +162,30 @@ mod tests {
     fn concurrency_floor_is_one() {
         let s = Scanner::new(vec![], PortSpec::new()).with_concurrency(0);
         assert_eq!(s.concurrency, 1);
+    }
+
+    #[tokio::test(flavor = "current_thread")]
+    async fn probe_closed_port_on_localhost_is_closed_or_filtered() {
+        // We can't guarantee 127.0.0.1:1 is closed on every CI image (it
+        // usually is), but the probe must return without panicking either way.
+        let s = probe("127.0.0.1:1".parse().unwrap(), Duration::from_millis(200)).await;
+        assert!(
+            matches!(s, ProbeStatus::Closed | ProbeStatus::Filtered),
+            "unexpected status: {s:?}"
+        );
+    }
+
+    #[tokio::test(flavor = "current_thread")]
+    async fn probe_open_port_via_ephemeral_listener() {
+        // Bind an ephemeral listener and probe it: the connect must succeed.
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let addr = listener.local_addr().unwrap();
+        let handle = tokio::spawn(async move {
+            let _ = listener.accept().await;
+        });
+        let status = probe(addr, Duration::from_millis(500)).await;
+        handle.abort();
+        assert_eq!(status, ProbeStatus::Open);
     }
 
     #[test]
