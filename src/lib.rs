@@ -428,6 +428,17 @@ mod tests {
     }
 
     #[test]
+    fn total_addresses_and_ports_match_total_probes() {
+        let s = Scanner::new(
+            vec!["10.0.0.0/29".parse().unwrap()],
+            "22,80".parse().unwrap(),
+        );
+        assert_eq!(s.total_addresses(), 8);
+        assert_eq!(s.total_ports(), 2);
+        assert_eq!(s.total_probes(), u128::from(s.total_ports()) * s.total_addresses());
+    }
+
+    #[test]
     fn distinct_open_ports_is_sorted_and_deduped() {
         let a = HostResult {
             addr: "10.0.0.1".parse().unwrap(),
