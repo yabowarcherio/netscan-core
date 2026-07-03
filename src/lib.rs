@@ -15,12 +15,15 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+use std::collections::BTreeMap;
 use std::net::{IpAddr, SocketAddr};
+use std::sync::Arc;
 use std::time::Duration;
 
 use cidr_utils::IpSet;
 use portspec::PortSpec;
 use tokio::net::TcpStream;
+use tokio::sync::Semaphore;
 use tokio::time::timeout;
 
 pub use cidr_utils;
@@ -83,6 +86,53 @@ impl Scanner {
             t.addresses()
                 .flat_map(move |a| self.ports.iter().map(move |p| SocketAddr::new(a, p)))
         })
+    }
+
+    /// Run every probe concurrently (bounded by `concurrency`) and return
+    /// the results grouped by host, in address order.
+    ///
+    /// Ports that answered a SYN-ACK land in [`HostResult::open_ports`],
+    /// sorted ascending. Hosts with zero open ports are still present in the
+    /// returned map — callers can filter with [`HostResult::is_alive`].
+    pub async fn run(&self) -> Vec<HostResult> {
+        let sem = Arc::new(Semaphore::new(self.concurrency));
+        let timeout_dur = self.timeout;
+        let mut handles = Vec::new();
+        for sock in self.probes() {
+            let sem = Arc::clone(&sem);
+            handles.push(tokio::spawn(async move {
+                // Slot acquired for the lifetime of the probe.
+                let _permit = sem.acquire_owned().await.expect("semaphore not closed");
+                let status = probe(sock, timeout_dur).await;
+                (sock, status)
+            }));
+        }
+
+        let mut open: BTreeMap<IpAddr, Vec<u16>> = BTreeMap::new();
+        // Pre-seed every target so hosts with zero open ports still appear
+        // in the output — that's what "no answer at all" looks like to a
+        // caller writing a report.
+        for t in &self.targets {
+            for a in t.addresses() {
+                open.entry(a).or_default();
+            }
+        }
+
+        for h in handles {
+            if let Ok((sock, ProbeStatus::Open)) = h.await {
+                open.entry(sock.ip()).or_default().push(sock.port());
+            }
+        }
+
+        open.into_iter()
+            .map(|(addr, mut ports)| {
+                ports.sort_unstable();
+                HostResult {
+                    addr,
+                    open_ports: ports,
+                }
+            })
+            .collect()
     }
 }
 
@@ -186,6 +236,48 @@ mod tests {
         let status = probe(addr, Duration::from_millis(500)).await;
         handle.abort();
         assert_eq!(status, ProbeStatus::Open);
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+    async fn scanner_run_finds_ephemeral_listener() {
+        // Bind one listener, then scan localhost across a range containing
+        // the listener's port and one closed neighbour.
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let port = listener.local_addr().unwrap().port();
+        let accepter = tokio::spawn(async move {
+            // Accept several connections so the semaphore doesn't back up.
+            for _ in 0..8 {
+                let _ = listener.accept().await;
+            }
+        });
+
+        let target: IpSet = "127.0.0.1".parse().unwrap();
+        let ports: PortSpec = format!("{port}").parse().unwrap();
+        let s = Scanner::new(vec![target], ports)
+            .with_timeout(Duration::from_millis(400))
+            .with_concurrency(4);
+        let results = s.run().await;
+        accepter.abort();
+
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].addr, "127.0.0.1".parse::<IpAddr>().unwrap());
+        assert_eq!(results[0].open_ports, vec![port]);
+        assert!(results[0].is_alive());
+    }
+
+    #[tokio::test(flavor = "current_thread")]
+    async fn scanner_run_includes_dead_hosts() {
+        // Scan a two-address range where neither address has any open ports.
+        // Both must appear in the output with an empty open_ports vec so the
+        // caller can report a full grid without missing rows.
+        let target: IpSet = "127.0.0.1-127.0.0.2".parse().unwrap();
+        let ports: PortSpec = "1".parse().unwrap();
+        let s = Scanner::new(vec![target], ports).with_timeout(Duration::from_millis(50));
+        let results = s.run().await;
+        assert_eq!(results.len(), 2);
+        for r in &results {
+            assert!(!r.is_alive());
+        }
     }
 
     #[test]
