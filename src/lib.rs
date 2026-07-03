@@ -259,6 +259,18 @@ pub fn alive_count(results: &[HostResult]) -> usize {
     alive_hosts(results).count()
 }
 
+/// The distinct open ports observed across a batch of results, deduped and
+/// sorted ascending.
+pub fn distinct_open_ports(results: &[HostResult]) -> Vec<u16> {
+    let mut ports: Vec<u16> = results
+        .iter()
+        .flat_map(|r| r.open_ports.iter().copied())
+        .collect();
+    ports.sort_unstable();
+    ports.dedup();
+    ports
+}
+
 /// A [`HostResult`] plus a MAC address and (resolved) vendor. Meant for the
 /// case where a caller has an ARP table or similar side-channel mapping IPs to
 /// MACs — this crate can't discover MACs on its own without raw-socket access.
