@@ -114,6 +114,18 @@ impl Scanner {
         self.ports.count()
     }
 
+    /// Replace the target list, keeping timeout/concurrency/ports intact.
+    pub fn with_targets(mut self, targets: Vec<IpSet>) -> Self {
+        self.targets = targets;
+        self
+    }
+
+    /// Replace the port list, keeping timeout/concurrency/targets intact.
+    pub fn with_ports(mut self, ports: PortSpec) -> Self {
+        self.ports = ports;
+        self
+    }
+
     /// Override the per-connection timeout. Values above
     /// [`PROBE_MAX_TIMEOUT`] are silently clamped.
     pub fn with_timeout(mut self, timeout: Duration) -> Self {
