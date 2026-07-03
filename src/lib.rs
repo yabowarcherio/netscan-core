@@ -440,6 +440,18 @@ mod tests {
     }
 
     #[test]
+    fn builder_methods_chain_cleanly() {
+        let s = Scanner::empty()
+            .with_targets(vec!["10.0.0.0/29".parse().unwrap()])
+            .with_ports("22,80".parse().unwrap())
+            .with_timeout(Duration::from_millis(200))
+            .with_concurrency(4);
+        assert_eq!(s.total_probes(), 16);
+        assert_eq!(s.timeout, Duration::from_millis(200));
+        assert_eq!(s.concurrency, 4);
+    }
+
+    #[test]
     fn total_addresses_and_ports_match_total_probes() {
         let s = Scanner::new(
             vec!["10.0.0.0/29".parse().unwrap()],
