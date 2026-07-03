@@ -212,7 +212,7 @@ impl Scanner {
 }
 
 /// The state of a single host after the scan finishes.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct HostResult {
     /// The scanned address.
     pub addr: IpAddr,
