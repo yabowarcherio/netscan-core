@@ -59,7 +59,7 @@ pub const QUICK_PORTS: &[u16] = &[22, 80, 443, 3389];
 pub const WEB_PORTS: &[u16] = &[80, 443, 8000, 8008, 8080, 8443, 8888];
 
 /// A single scan configuration.
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash)]
 pub struct Scanner {
     /// The host targets to probe.
     pub targets: Vec<IpSet>,
