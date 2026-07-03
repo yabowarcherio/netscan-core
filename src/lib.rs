@@ -418,6 +418,31 @@ mod tests {
     }
 
     #[test]
+    fn distinct_open_ports_is_sorted_and_deduped() {
+        let a = HostResult {
+            addr: "10.0.0.1".parse().unwrap(),
+            open_ports: vec![80, 22, 80],
+        };
+        let b = HostResult {
+            addr: "10.0.0.2".parse().unwrap(),
+            open_ports: vec![22, 443],
+        };
+        assert_eq!(distinct_open_ports(&[a, b]), vec![22, 80, 443]);
+    }
+
+    #[test]
+    fn alive_count_matches_alive_hosts_count() {
+        let a = HostResult {
+            addr: "10.0.0.1".parse().unwrap(),
+            open_ports: vec![22],
+        };
+        let b = HostResult::new("10.0.0.2".parse().unwrap());
+        let batch = [a, b];
+        assert_eq!(alive_count(&batch), alive_hosts(&batch).count());
+        assert_eq!(alive_count(&batch), 1);
+    }
+
+    #[test]
     fn quick_ports_and_web_ports_are_non_empty() {
         assert!(!QUICK_PORTS.is_empty());
         assert!(!WEB_PORTS.is_empty());
