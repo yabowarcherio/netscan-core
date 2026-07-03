@@ -104,6 +104,11 @@ impl Scanner {
         Duration::from_secs(secs)
     }
 
+    /// Sum of address counts across every target set.
+    pub fn total_addresses(&self) -> u128 {
+        self.targets.iter().map(IpSet::count).sum()
+    }
+
     /// Override the per-connection timeout. Values above
     /// [`PROBE_MAX_TIMEOUT`] are silently clamped.
     pub fn with_timeout(mut self, timeout: Duration) -> Self {
