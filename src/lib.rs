@@ -109,6 +109,11 @@ impl Scanner {
         self.targets.iter().map(IpSet::count).sum()
     }
 
+    /// Number of ports probed against each host.
+    pub fn total_ports(&self) -> u32 {
+        self.ports.count()
+    }
+
     /// Override the per-connection timeout. Values above
     /// [`PROBE_MAX_TIMEOUT`] are silently clamped.
     pub fn with_timeout(mut self, timeout: Duration) -> Self {
