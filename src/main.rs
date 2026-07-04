@@ -132,8 +132,9 @@ fn run(cli: Cli) -> Result<(), String> {
             serde_json::to_string_pretty(&records).map_err(|e| format!("json: {e}"))?
         );
     } else if !cli.quiet {
+        let want_all = cli.report.eq_ignore_ascii_case("all");
         for r in &results {
-            if r.is_alive() {
+            if r.is_alive() || want_all {
                 let ports = r
                     .open_ports
                     .iter()
