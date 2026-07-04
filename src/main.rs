@@ -42,6 +42,10 @@ struct Cli {
     #[arg(long)]
     dry_run: bool,
 
+    /// Suppress alive-hosts stdout (still emits errors to stderr).
+    #[arg(long, conflicts_with = "json")]
+    quiet: bool,
+
     /// Send a Wake-on-LAN magic packet to each MAC (repeatable), then exit.
     /// Scanning targets are ignored when --wake is set.
     #[arg(long, value_name = "MAC", num_args = 1..)]
@@ -123,7 +127,7 @@ fn run(cli: Cli) -> Result<(), String> {
             "{}",
             serde_json::to_string_pretty(&records).map_err(|e| format!("json: {e}"))?
         );
-    } else {
+    } else if !cli.quiet {
         for r in &results {
             if r.is_alive() {
                 let ports = r
