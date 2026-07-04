@@ -89,6 +89,25 @@ fn wake_bad_mac_exits_two() {
 }
 
 #[test]
+fn report_all_recognized() {
+    // The presence of --report all in --dry-run doesn't change the plan, but
+    // it must not fail parsing either.
+    let (code, _, _) = run({
+        let mut c = bin();
+        c.args([
+            "--dry-run",
+            "--report",
+            "all",
+            "10.0.0.1",
+            "--ports",
+            "22",
+        ]);
+        c
+    });
+    assert_eq!(code, 0);
+}
+
+#[test]
 fn quiet_flag_conflicts_with_json() {
     let (code, _, err) = run({
         let mut c = bin();
