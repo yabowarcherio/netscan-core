@@ -38,6 +38,10 @@ struct Cli {
     #[arg(long)]
     json: bool,
 
+    /// Report only alive hosts (matches the default) or all hosts.
+    #[arg(long, value_name = "MODE", default_value = "alive")]
+    report: String,
+
     /// Only print the total number of probes and exit, without scanning.
     #[arg(long)]
     dry_run: bool,
