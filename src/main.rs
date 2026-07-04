@@ -16,7 +16,12 @@ use portspec::PortSpec;
 /// Async TCP connect-scanner. Composes cidr-utils, portspec, oui-lookup, and
 /// wol-rs into a single command.
 #[derive(Parser, Debug)]
-#[command(name = "netscan", version, about)]
+#[command(
+    name = "netscan",
+    version,
+    about,
+    long_about = "TCP connect scanner. Targets and --ports accept everything the sibling crates parse (CIDR, ranges, bare IPs; port numbers, ranges, and service names)."
+)]
 struct Cli {
     /// One or more targets: CIDR block, address range, or bare address.
     #[arg(value_name = "TARGET", required_unless_present = "wake")]
