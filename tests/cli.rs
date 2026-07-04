@@ -89,6 +89,24 @@ fn wake_bad_mac_exits_two() {
 }
 
 #[test]
+fn report_unknown_exits_two() {
+    let (code, _, err) = run({
+        let mut c = bin();
+        c.args([
+            "--dry-run",
+            "--report",
+            "everything",
+            "10.0.0.1",
+            "--ports",
+            "22",
+        ]);
+        c
+    });
+    assert_eq!(code, 2);
+    assert!(err.contains("--report"));
+}
+
+#[test]
 fn report_all_recognized() {
     // The presence of --report all in --dry-run doesn't change the plan, but
     // it must not fail parsing either.
