@@ -69,6 +69,10 @@ fn parse_targets(raw: &[String]) -> Result<Vec<IpSet>, String> {
 
 fn run(cli: Cli) -> Result<(), String> {
     // --wake short-circuits: skip target/port validation entirely.
+    if !cli.report.eq_ignore_ascii_case("alive") && !cli.report.eq_ignore_ascii_case("all") {
+        return Err(format!("--report expects 'alive' or 'all', got {:?}", cli.report));
+    }
+
     if !cli.wake.is_empty() {
         let macs: Vec<[u8; 6]> = cli
             .wake
