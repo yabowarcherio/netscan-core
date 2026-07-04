@@ -74,9 +74,42 @@ fn run(cli: Cli) -> Result<(), String> {
         return Ok(());
     }
 
-    // Live scanning lands in a follow-up commit; for now the binary refuses
-    // to pretend it did something it didn't.
-    Err("live scanning not yet implemented — pass --dry-run to preview the plan".into())
+    // Live scan.
+    let rt = tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .map_err(|e| format!("runtime: {e}"))?;
+    let results = rt.block_on(scanner.run());
+
+    if cli.json {
+        let records: Vec<_> = results
+            .iter()
+            .map(|r| {
+                serde_json::json!({
+                    "addr": r.addr.to_string(),
+                    "open_ports": r.open_ports,
+                    "alive": r.is_alive(),
+                })
+            })
+            .collect();
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&records).map_err(|e| format!("json: {e}"))?
+        );
+    } else {
+        for r in &results {
+            if r.is_alive() {
+                let ports = r
+                    .open_ports
+                    .iter()
+                    .map(|p| p.to_string())
+                    .collect::<Vec<_>>()
+                    .join(",");
+                println!("{}\t{ports}", r.addr);
+            }
+        }
+    }
+    Ok(())
 }
 
 fn main() -> ExitCode {
