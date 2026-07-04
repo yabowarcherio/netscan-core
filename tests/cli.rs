@@ -89,6 +89,17 @@ fn wake_bad_mac_exits_two() {
 }
 
 #[test]
+fn quiet_flag_conflicts_with_json() {
+    let (code, _, err) = run({
+        let mut c = bin();
+        c.args(["--dry-run", "--quiet", "--json", "10.0.0.1", "--ports", "22"]);
+        c
+    });
+    assert_eq!(code, 2);
+    assert!(err.contains("cannot be used with"));
+}
+
+#[test]
 fn service_name_in_ports_parses() {
     let (code, out, _) = run({
         let mut c = bin();
