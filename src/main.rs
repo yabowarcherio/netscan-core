@@ -47,6 +47,10 @@ struct Cli {
     #[arg(long, value_name = "MODE", default_value = "alive")]
     report: String,
 
+    /// Sort output by address (default) or by number of open ports desc.
+    #[arg(long, value_name = "KEY", default_value = "addr")]
+    sort: String,
+
     /// Only print the total number of probes and exit, without scanning.
     #[arg(long)]
     dry_run: bool,
@@ -123,7 +127,12 @@ fn run(cli: Cli) -> Result<(), String> {
         .enable_all()
         .build()
         .map_err(|e| format!("runtime: {e}"))?;
-    let results = rt.block_on(scanner.run());
+    let mut results = rt.block_on(scanner.run());
+    if cli.sort.eq_ignore_ascii_case("ports") {
+        // Descending by number of open ports, ties broken by address for
+        // deterministic output.
+        results.sort_by(|a, b| b.open_ports.len().cmp(&a.open_ports.len()).then(a.addr.cmp(&b.addr)));
+    }
 
     if cli.json {
         let records: Vec<_> = results
