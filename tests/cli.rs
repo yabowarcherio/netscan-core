@@ -89,6 +89,24 @@ fn wake_bad_mac_exits_two() {
 }
 
 #[test]
+fn sort_unknown_exits_two() {
+    let (code, _, err) = run({
+        let mut c = bin();
+        c.args([
+            "--dry-run",
+            "--sort",
+            "size",
+            "10.0.0.1",
+            "--ports",
+            "22",
+        ]);
+        c
+    });
+    assert_eq!(code, 2);
+    assert!(err.contains("--sort"));
+}
+
+#[test]
 fn report_unknown_exits_two() {
     let (code, _, err) = run({
         let mut c = bin();
