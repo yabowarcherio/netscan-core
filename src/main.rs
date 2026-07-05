@@ -80,6 +80,9 @@ fn run(cli: Cli) -> Result<(), String> {
     if !cli.report.eq_ignore_ascii_case("alive") && !cli.report.eq_ignore_ascii_case("all") {
         return Err(format!("--report expects 'alive' or 'all', got {:?}", cli.report));
     }
+    if !cli.sort.eq_ignore_ascii_case("addr") && !cli.sort.eq_ignore_ascii_case("ports") {
+        return Err(format!("--sort expects 'addr' or 'ports', got {:?}", cli.sort));
+    }
 
     if !cli.wake.is_empty() {
         let macs: Vec<[u8; 6]> = cli
