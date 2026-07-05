@@ -51,6 +51,10 @@ struct Cli {
     #[arg(long, value_name = "KEY", default_value = "addr")]
     sort: String,
 
+    /// Cap the number of output rows to N (0 = unlimited).
+    #[arg(long, value_name = "N", default_value_t = 0)]
+    limit: usize,
+
     /// Only print the total number of probes and exit, without scanning.
     #[arg(long)]
     dry_run: bool,
@@ -132,6 +136,9 @@ fn run(cli: Cli) -> Result<(), String> {
         // Descending by number of open ports, ties broken by address for
         // deterministic output.
         results.sort_by(|a, b| b.open_ports.len().cmp(&a.open_ports.len()).then(a.addr.cmp(&b.addr)));
+    }
+    if cli.limit > 0 && results.len() > cli.limit {
+        results.truncate(cli.limit);
     }
 
     if cli.json {
