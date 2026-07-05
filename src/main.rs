@@ -44,6 +44,9 @@ struct Cli {
     json: bool,
 
     /// Report only alive hosts (matches the default) or all hosts.
+    ///
+    /// Accepts `alive` (skip dead hosts) or `all` (include every scanned
+    /// address even if no port responded).
     #[arg(long, value_name = "MODE", default_value = "alive")]
     report: String,
 
