@@ -32,6 +32,9 @@ struct Cli {
     ports: String,
 
     /// Per-connection TCP-connect timeout, in milliseconds.
+    ///
+    /// Values above PROBE_MAX_TIMEOUT (120 seconds) are silently clamped
+    /// by the underlying library.
     #[arg(long, default_value_t = DEFAULT_TIMEOUT.as_millis() as u64)]
     timeout_ms: u64,
 
