@@ -48,6 +48,9 @@ struct Cli {
     report: String,
 
     /// Sort output by address (default) or by number of open ports desc.
+    ///
+    /// Accepts `addr` (lexicographic address order) or `ports`
+    /// (descending count of open ports, ties broken by address).
     #[arg(long, value_name = "KEY", default_value = "addr")]
     sort: String,
 
