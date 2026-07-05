@@ -68,7 +68,8 @@ struct Cli {
     #[arg(long)]
     dry_run: bool,
 
-    /// Suppress alive-hosts stdout (still emits errors to stderr).
+    /// Suppress alive-hosts stdout. Errors still go to stderr, as does the
+    /// `# alive: N / M` tally.
     #[arg(long, conflicts_with = "json")]
     quiet: bool,
 
