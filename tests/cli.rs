@@ -89,6 +89,26 @@ fn wake_bad_mac_exits_two() {
 }
 
 #[test]
+fn limit_zero_means_unlimited() {
+    // 8 probes should all appear in the plan; --limit only affects the
+    // scan-time output, not --dry-run counting.
+    let (code, out, _) = run({
+        let mut c = bin();
+        c.args([
+            "--dry-run",
+            "--limit",
+            "0",
+            "10.0.0.0/30",
+            "--ports",
+            "22,80",
+        ]);
+        c
+    });
+    assert_eq!(code, 0);
+    assert!(out.contains("planned probes: 8"), "stdout: {out}");
+}
+
+#[test]
 fn sort_unknown_exits_two() {
     let (code, _, err) = run({
         let mut c = bin();
