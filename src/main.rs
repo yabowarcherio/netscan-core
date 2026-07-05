@@ -52,6 +52,9 @@ struct Cli {
     sort: String,
 
     /// Cap the number of output rows to N (0 = unlimited).
+    ///
+    /// Applied after `--sort`; useful together with `--sort ports` for
+    /// "give me the top-N hosts by open ports".
     #[arg(long, value_name = "N", default_value_t = 0)]
     limit: usize,
 
