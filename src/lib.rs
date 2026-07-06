@@ -502,6 +502,17 @@ mod tests {
     }
 
     #[test]
+    fn dead_and_alive_counts_partition_the_batch() {
+        let a = HostResult {
+            addr: "10.0.0.1".parse().unwrap(),
+            open_ports: vec![22],
+        };
+        let b = HostResult::new("10.0.0.2".parse().unwrap());
+        let batch = [a, b];
+        assert_eq!(alive_count(&batch) + dead_count(&batch), batch.len());
+    }
+
+    #[test]
     fn distinct_open_ports_is_sorted_and_deduped() {
         let a = HostResult {
             addr: "10.0.0.1".parse().unwrap(),
