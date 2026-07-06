@@ -690,6 +690,28 @@ mod tests {
     }
 
     #[test]
+    fn enriched_host_accessors_delegate_to_underlying_host() {
+        let host = HostResult {
+            addr: "10.0.0.1".parse().unwrap(),
+            open_ports: vec![22, 80],
+        };
+        let e = host.enrich([0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF]);
+        assert_eq!(e.addr(), "10.0.0.1".parse::<IpAddr>().unwrap());
+        assert_eq!(e.open_ports(), &[22, 80]);
+        assert!(e.is_alive());
+    }
+
+    #[test]
+    fn enriched_host_has_vendor_requires_both_mac_and_vendor() {
+        let host = HostResult::new("10.0.0.1".parse().unwrap());
+        let mut e = host.enrich([0x00, 0x00, 0x00, 0x00, 0x00, 0x01]);
+        e.set_vendor(None);
+        assert!(!e.has_vendor());
+        e.set_vendor(Some("test".into()));
+        assert!(e.has_vendor());
+    }
+
+    #[test]
     fn host_result_enrich_resolves_vendor_for_registered_oui() {
         let host = HostResult {
             addr: "10.0.0.1".parse().unwrap(),
