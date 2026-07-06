@@ -321,6 +321,17 @@ impl EnrichedHost {
     pub fn open_ports(&self) -> &[u16] {
         &self.host.open_ports
     }
+
+    /// Update the vendor name in-place. Useful when a caller wants to try
+    /// their own fallback registry after this crate's OUI lookup miss.
+    pub fn set_vendor(&mut self, vendor: Option<String>) {
+        self.vendor = vendor;
+    }
+
+    /// `true` when both a MAC and a vendor name are attached.
+    pub fn has_vendor(&self) -> bool {
+        self.mac.is_some() && self.vendor.is_some()
+    }
 }
 
 /// Build and send a Wake-on-LAN magic packet to `mac` on the local subnet
