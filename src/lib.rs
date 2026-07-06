@@ -314,9 +314,12 @@ pub fn distinct_open_ports(results: &[HostResult]) -> Vec<u16> {
     ports
 }
 
-/// A [`HostResult`] plus a MAC address and (resolved) vendor. Meant for the
-/// case where a caller has an ARP table or similar side-channel mapping IPs to
-/// MACs — this crate can't discover MACs on its own without raw-socket access.
+/// A [`HostResult`] plus a MAC address and (resolved) vendor.
+///
+/// Meant for the case where a caller has an ARP table or similar
+/// side-channel mapping IPs to MACs — this crate can't discover MACs on its
+/// own without raw-socket access, which requires privileges we deliberately
+/// don't ask for.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EnrichedHost {
     /// The underlying scan result.
