@@ -311,6 +311,16 @@ impl EnrichedHost {
     pub fn is_alive(&self) -> bool {
         self.host.is_alive()
     }
+
+    /// The scanned address, delegating through the underlying `host`.
+    pub fn addr(&self) -> IpAddr {
+        self.host.addr
+    }
+
+    /// The list of open ports, delegating through the underlying `host`.
+    pub fn open_ports(&self) -> &[u16] {
+        &self.host.open_ports
+    }
 }
 
 /// Build and send a Wake-on-LAN magic packet to `mac` on the local subnet
