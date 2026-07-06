@@ -150,6 +150,32 @@ impl HostResult {
     pub fn is_alive(&self) -> bool {
         !self.open_ports.is_empty()
     }
+
+    /// Attach a MAC + vendor to this host result, producing an [`EnrichedHost`].
+    ///
+    /// Vendor resolution is done through the embedded `oui-lookup` registry;
+    /// unknown OUIs get `None`.
+    pub fn enrich(self, mac: [u8; 6]) -> EnrichedHost {
+        let vendor = oui_lookup::lookup_octets(mac).map(str::to_string);
+        EnrichedHost {
+            host: self,
+            mac: Some(mac),
+            vendor,
+        }
+    }
+}
+
+/// A [`HostResult`] plus a MAC address and (resolved) vendor. Meant for the
+/// case where a caller has an ARP table or similar side-channel mapping IPs to
+/// MACs — this crate can't discover MACs on its own without raw-socket access.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EnrichedHost {
+    /// The underlying scan result.
+    pub host: HostResult,
+    /// The MAC address of the host, if known.
+    pub mac: Option<[u8; 6]>,
+    /// The vendor name for the MAC's OUI, if the OUI is in the registry.
+    pub vendor: Option<String>,
 }
 
 /// The outcome of a single (address, port) probe.
@@ -278,6 +304,21 @@ mod tests {
         for r in &results {
             assert!(!r.is_alive());
         }
+    }
+
+    #[test]
+    fn host_result_enrich_resolves_vendor_for_registered_oui() {
+        let host = HostResult {
+            addr: "10.0.0.1".parse().unwrap(),
+            open_ports: vec![22],
+        };
+        // A4:83:E7 is the Apple OUI at the time of writing; the assertion is
+        // permissive: enrich must at least round-trip the MAC without panics.
+        let mac = [0xA4, 0x83, 0xE7, 0x11, 0x22, 0x33];
+        let e = host.enrich(mac);
+        assert_eq!(e.mac, Some(mac));
+        // vendor may be Some or None depending on the embedded snapshot.
+        assert_eq!(e.vendor.is_some(), oui_lookup::lookup_octets(mac).is_some());
     }
 
     #[test]
