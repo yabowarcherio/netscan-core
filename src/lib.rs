@@ -296,7 +296,7 @@ pub fn distinct_open_ports(results: &[HostResult]) -> Vec<u16> {
 /// A [`HostResult`] plus a MAC address and (resolved) vendor. Meant for the
 /// case where a caller has an ARP table or similar side-channel mapping IPs to
 /// MACs — this crate can't discover MACs on its own without raw-socket access.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EnrichedHost {
     /// The underlying scan result.
     pub host: HostResult,
@@ -304,6 +304,13 @@ pub struct EnrichedHost {
     pub mac: Option<[u8; 6]>,
     /// The vendor name for the MAC's OUI, if the OUI is in the registry.
     pub vendor: Option<String>,
+}
+
+impl EnrichedHost {
+    /// Delegating shortcut to [`HostResult::is_alive`].
+    pub fn is_alive(&self) -> bool {
+        self.host.is_alive()
+    }
 }
 
 /// Build and send a Wake-on-LAN magic packet to `mac` on the local subnet
