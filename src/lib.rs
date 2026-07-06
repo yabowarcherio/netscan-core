@@ -512,6 +512,22 @@ mod tests {
     }
 
     #[test]
+    fn top_host_picks_the_host_with_most_open_ports() {
+        let a = HostResult {
+            addr: "10.0.0.1".parse().unwrap(),
+            open_ports: vec![22, 80],
+        };
+        let b = HostResult {
+            addr: "10.0.0.2".parse().unwrap(),
+            open_ports: vec![22],
+        };
+        let batch = [a.clone(), b];
+        assert_eq!(top_host(&batch), Some(&a));
+        let empty: [HostResult; 0] = [];
+        assert!(top_host(&empty).is_none());
+    }
+
+    #[test]
     fn dead_and_alive_counts_partition_the_batch() {
         let a = HostResult {
             addr: "10.0.0.1".parse().unwrap(),
