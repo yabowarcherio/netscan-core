@@ -287,6 +287,16 @@ pub fn dead_count(results: &[HostResult]) -> usize {
     dead_hosts(results).count()
 }
 
+/// Find the [`HostResult`] with the highest number of open ports.
+///
+/// Ties are broken by the address's natural order, and an empty slice yields
+/// `None`.
+pub fn top_host(results: &[HostResult]) -> Option<&HostResult> {
+    results
+        .iter()
+        .max_by(|a, b| a.open_ports.len().cmp(&b.open_ports.len()).then(b.addr.cmp(&a.addr)))
+}
+
 /// Count how many hosts in a batch responded on at least one port.
 pub fn alive_count(results: &[HostResult]) -> usize {
     alive_hosts(results).count()
