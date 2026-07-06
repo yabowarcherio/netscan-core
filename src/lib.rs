@@ -276,6 +276,17 @@ pub fn alive_hosts(results: &[HostResult]) -> impl Iterator<Item = &HostResult> 
     results.iter().filter(|r| r.is_alive())
 }
 
+/// Extract every dead host from a batch of results — the complement of
+/// [`alive_hosts`].
+pub fn dead_hosts(results: &[HostResult]) -> impl Iterator<Item = &HostResult> {
+    results.iter().filter(|r| !r.is_alive())
+}
+
+/// Count how many hosts in a batch had zero open ports.
+pub fn dead_count(results: &[HostResult]) -> usize {
+    dead_hosts(results).count()
+}
+
 /// Count how many hosts in a batch responded on at least one port.
 pub fn alive_count(results: &[HostResult]) -> usize {
     alive_hosts(results).count()
