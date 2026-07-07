@@ -386,6 +386,19 @@ where
     Ok(())
 }
 
+/// Wake many MACs sequentially, collecting each individual result rather than
+/// aborting on the first error. The output preserves input order.
+pub async fn wake_many_collect<I>(macs: I) -> Vec<std::io::Result<()>>
+where
+    I: IntoIterator<Item = [u8; 6]>,
+{
+    let mut out = Vec::new();
+    for mac in macs {
+        out.push(wake(mac).await);
+    }
+    out
+}
+
 /// Default number of repeats used by [`wake_repeat`] when the caller doesn't
 /// override it — some BIOSes need at least two magic packets before the NIC
 /// actually reacts.
