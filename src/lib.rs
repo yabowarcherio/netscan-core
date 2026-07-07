@@ -375,6 +375,25 @@ pub async fn wake(mac: [u8; 6]) -> std::io::Result<()> {
     Ok(())
 }
 
+/// Send the same magic packet `n` times, pausing `interval` between sends.
+///
+/// Some BIOSes need 2-3 packets before the NIC reacts. `n` is treated as at
+/// least 1.
+pub async fn wake_repeat(
+    mac: [u8; 6],
+    n: u32,
+    interval: Duration,
+) -> std::io::Result<()> {
+    let n = n.max(1);
+    for i in 0..n {
+        wake(mac).await?;
+        if i + 1 < n {
+            tokio::time::sleep(interval).await;
+        }
+    }
+    Ok(())
+}
+
 /// The outcome of a single (address, port) probe.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ProbeStatus {
