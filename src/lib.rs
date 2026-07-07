@@ -406,6 +406,11 @@ pub fn wake_success_count(results: &[std::io::Result<()>]) -> usize {
     results.iter().filter(|r| r.is_ok()).count()
 }
 
+/// Count how many MACs in the batch failed at the socket layer.
+pub fn wake_failure_count(results: &[std::io::Result<()>]) -> usize {
+    results.iter().filter(|r| r.is_err()).count()
+}
+
 /// Default number of repeats used by [`wake_repeat`] when the caller doesn't
 /// override it — some BIOSes need at least two magic packets before the NIC
 /// actually reacts.
