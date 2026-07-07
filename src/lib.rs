@@ -375,6 +375,17 @@ pub async fn wake(mac: [u8; 6]) -> std::io::Result<()> {
     Ok(())
 }
 
+/// Wake many MACs sequentially, stopping on the first error.
+pub async fn wake_many<I>(macs: I) -> std::io::Result<()>
+where
+    I: IntoIterator<Item = [u8; 6]>,
+{
+    for mac in macs {
+        wake(mac).await?;
+    }
+    Ok(())
+}
+
 /// Default number of repeats used by [`wake_repeat`] when the caller doesn't
 /// override it — some BIOSes need at least two magic packets before the NIC
 /// actually reacts.
