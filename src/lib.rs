@@ -778,6 +778,16 @@ mod tests {
         }
     }
 
+    #[test]
+    fn wake_success_count_matches_manual_count() {
+        let results: Vec<std::io::Result<()>> = vec![
+            Ok(()),
+            Err(std::io::Error::from(std::io::ErrorKind::HostUnreachable)),
+            Ok(()),
+        ];
+        assert_eq!(wake_success_count(&results), 2);
+    }
+
     #[tokio::test(flavor = "current_thread")]
     async fn wake_repeat_zero_is_promoted_to_one() {
         // Passing 0 shouldn't panic or hang; the fn silently sends one packet.
