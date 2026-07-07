@@ -375,6 +375,14 @@ pub async fn wake(mac: [u8; 6]) -> std::io::Result<()> {
     Ok(())
 }
 
+/// Default number of repeats used by [`wake_repeat`] when the caller doesn't
+/// override it — some BIOSes need at least two magic packets before the NIC
+/// actually reacts.
+pub const DEFAULT_WAKE_REPEATS: u32 = 3;
+
+/// Default pause between successive [`wake_repeat`] sends.
+pub const DEFAULT_WAKE_INTERVAL: Duration = Duration::from_millis(100);
+
 /// Send the same magic packet `n` times, pausing `interval` between sends.
 ///
 /// Some BIOSes need 2-3 packets before the NIC reacts. `n` is treated as at
