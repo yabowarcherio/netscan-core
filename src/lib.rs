@@ -178,6 +178,23 @@ pub struct EnrichedHost {
     pub vendor: Option<String>,
 }
 
+/// Build and send a Wake-on-LAN magic packet to `mac` on the local subnet
+/// broadcast. Non-blocking; returns after the UDP send completes.
+///
+/// Delegates to `wol_rs` for the packet layout. Uses IPv4 limited broadcast
+/// (`255.255.255.255`) on port `9` — the conventional WoL destination.
+pub async fn wake(mac: [u8; 6]) -> std::io::Result<()> {
+    let sock = tokio::net::UdpSocket::bind("0.0.0.0:0").await?;
+    sock.set_broadcast(true)?;
+    let pkt = wol_rs::magic_packet_array(mac);
+    sock.send_to(
+        &pkt,
+        (wol_rs::IPV4_LIMITED_BROADCAST, wol_rs::BROADCAST_PORT),
+    )
+    .await?;
+    Ok(())
+}
+
 /// The outcome of a single (address, port) probe.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProbeStatus {
@@ -304,6 +321,15 @@ mod tests {
         for r in &results {
             assert!(!r.is_alive());
         }
+    }
+
+    #[tokio::test(flavor = "current_thread")]
+    async fn wake_builds_and_sends_over_udp_without_error() {
+        // Sending a broadcast to a random MAC only fails when the socket
+        // itself can't be bound — which shouldn't happen on any dev/CI box
+        // that has a loopback interface.
+        let res = wake([0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF]).await;
+        assert!(res.is_ok(), "wake failed: {res:?}");
     }
 
     #[test]
