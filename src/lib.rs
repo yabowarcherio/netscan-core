@@ -748,6 +748,22 @@ mod tests {
     }
 
     #[tokio::test(flavor = "current_thread")]
+    async fn wake_repeat_zero_is_promoted_to_one() {
+        // Passing 0 shouldn't panic or hang; the fn silently sends one packet.
+        use std::io::ErrorKind;
+        let res = wake_repeat([0; 6], 0, Duration::from_millis(1)).await;
+        match res {
+            Ok(()) => {}
+            Err(e)
+                if matches!(
+                    e.kind(),
+                    ErrorKind::HostUnreachable | ErrorKind::NetworkUnreachable
+                ) => {}
+            Err(e) => panic!("wake_repeat failed unexpectedly: {e:?}"),
+        }
+    }
+
+    #[tokio::test(flavor = "current_thread")]
     async fn wake_reaches_the_socket_layer() {
         // The interesting invariant is that wake() gets the packet all the way
         // to the OS socket layer without a bind/setsockopt failure. Whether
