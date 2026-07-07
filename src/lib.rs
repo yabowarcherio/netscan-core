@@ -362,7 +362,8 @@ impl EnrichedHost {
 /// broadcast. Non-blocking; returns after the UDP send completes.
 ///
 /// Delegates to `wol_rs` for the packet layout. Uses IPv4 limited broadcast
-/// (`255.255.255.255`) on port `9` — the conventional WoL destination.
+/// (`255.255.255.255`) on port [`wol_rs::BROADCAST_PORT`] (9 by convention)
+/// — the conventional WoL destination.
 pub async fn wake(mac: [u8; 6]) -> std::io::Result<()> {
     let sock = tokio::net::UdpSocket::bind("0.0.0.0:0").await?;
     sock.set_broadcast(true)?;
