@@ -114,6 +114,11 @@ impl Scanner {
         self.ports.count()
     }
 
+    /// Number of target sets configured on this scanner.
+    pub fn target_count(&self) -> usize {
+        self.targets.len()
+    }
+
     /// Replace the target list, keeping timeout/concurrency/ports intact.
     pub fn with_targets(mut self, targets: Vec<IpSet>) -> Self {
         self.targets = targets;
