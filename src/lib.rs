@@ -588,6 +588,19 @@ mod tests {
     }
 
     #[test]
+    fn clear_targets_leaves_ports_and_config() {
+        let s = Scanner::empty()
+            .push_target("10.0.0.0/30".parse().unwrap())
+            .with_ports("22,80".parse().unwrap())
+            .with_concurrency(8)
+            .clear_targets();
+        assert_eq!(s.target_count(), 0);
+        // Ports/concurrency survive the clear.
+        assert_eq!(s.total_ports(), 2);
+        assert_eq!(s.concurrency, 8);
+    }
+
+    #[test]
     fn estimated_duration_scales_with_probes() {
         let single = Scanner::new(vec!["10.0.0.1".parse().unwrap()], "22".parse().unwrap())
             .with_concurrency(1)
