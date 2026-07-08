@@ -119,6 +119,12 @@ impl Scanner {
         self.targets.len()
     }
 
+    /// Append a target to the existing list, returning the scanner for chaining.
+    pub fn push_target(mut self, target: IpSet) -> Self {
+        self.targets.push(target);
+        self
+    }
+
     /// Replace the target list, keeping timeout/concurrency/ports intact.
     pub fn with_targets(mut self, targets: Vec<IpSet>) -> Self {
         self.targets = targets;
