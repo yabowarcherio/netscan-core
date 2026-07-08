@@ -582,6 +582,17 @@ mod tests {
     }
 
     #[test]
+    fn estimated_duration_scales_with_probes() {
+        let single = Scanner::new(vec!["10.0.0.1".parse().unwrap()], "22".parse().unwrap())
+            .with_concurrency(1)
+            .with_timeout(Duration::from_secs(1));
+        let wide = Scanner::new(vec!["10.0.0.0/28".parse().unwrap()], "22".parse().unwrap())
+            .with_concurrency(1)
+            .with_timeout(Duration::from_secs(1));
+        assert!(wide.estimated_duration() > single.estimated_duration());
+    }
+
+    #[test]
     fn push_target_appends_and_updates_count() {
         let s = Scanner::empty();
         assert_eq!(s.target_count(), 0);
