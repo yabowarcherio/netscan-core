@@ -28,12 +28,12 @@ default = ["cli"]
 cli = ["dep:clap", "dep:serde", "dep:serde_json"]
 
 [dependencies]
-# Sibling stepping-stone crates (path deps during co-development; switch to
-# git tags before publishing).
-cidr-utils = { path = "../cidr-utils", default-features = false }
-portspec = { path = "../portspec", default-features = false }
-oui-lookup = { path = "../oui-lookup", default-features = false }
-wol-rs = { path = "../wol-rs", default-features = false }
+# Sibling stepping-stone crates. Pinned to git tags so netscan-core stands
+# alone (no sibling checkouts required) and each version bump is deliberate.
+cidr-utils = { git = "https://github.com/yabowarcherio/cidr-utils", tag = "v0.3.0", default-features = false }
+portspec = { git = "https://github.com/yabowarcherio/portspec", tag = "v0.3.0", default-features = false }
+oui-lookup = { git = "https://github.com/yabowarcherio/oui-lookup", tag = "v0.8.0", default-features = false }
+wol-rs = { git = "https://github.com/yabowarcherio/wol-rs", tag = "v0.2.0", default-features = false }
 
 tokio = { version = "1", features = [
     "net",
