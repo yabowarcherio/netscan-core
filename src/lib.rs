@@ -93,9 +93,12 @@ impl Scanner {
         self.targets.is_empty() || self.ports.is_empty()
     }
 
-    /// Rough upper bound on how long the scan will take: the total number of
-    /// probes divided by concurrency, times the per-probe timeout. Assumes
-    /// the worst case where every probe times out.
+    /// Rough upper bound on how long the scan will take.
+    ///
+    /// Computed as `ceil(total_probes / concurrency) * max(timeout, 1s)`,
+    /// so a caller with `1e9` probes gets a large but non-wrapping estimate.
+    /// Assumes the worst case where every probe times out — real scans are
+    /// typically much faster because open ports respond within a few ms.
     pub fn estimated_duration(&self) -> Duration {
         let batches = self.total_probes().div_ceil(self.concurrency.max(1) as u128);
         // Saturating math: a caller with 1e9 probes should get a large, but
