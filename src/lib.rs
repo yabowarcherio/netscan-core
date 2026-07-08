@@ -83,7 +83,8 @@ impl Scanner {
     }
 
     /// Construct an empty scanner — no targets, no ports.
-    /// Equivalent to [`Scanner::default`].
+    /// Equivalent to [`Scanner::default`], but reads more naturally at the
+    /// head of a builder chain.
     pub fn empty() -> Self {
         Self::default()
     }
