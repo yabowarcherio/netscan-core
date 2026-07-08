@@ -144,7 +144,8 @@ impl Scanner {
         self
     }
 
-    /// Override the maximum concurrency.
+    /// Override the maximum concurrency. Zero is promoted to one — a scan is
+    /// pointless with no in-flight probes.
     pub fn with_concurrency(mut self, concurrency: usize) -> Self {
         self.concurrency = concurrency.max(1);
         self
