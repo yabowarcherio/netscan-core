@@ -128,6 +128,12 @@ impl Scanner {
         self
     }
 
+    /// Clear the target list without disturbing the ports/timeout/concurrency.
+    pub fn clear_targets(mut self) -> Self {
+        self.targets.clear();
+        self
+    }
+
     /// Replace the target list, keeping timeout/concurrency/ports intact.
     pub fn with_targets(mut self, targets: Vec<IpSet>) -> Self {
         self.targets = targets;
