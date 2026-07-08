@@ -578,6 +578,18 @@ mod tests {
     }
 
     #[test]
+    fn push_target_appends_and_updates_count() {
+        let s = Scanner::empty();
+        assert_eq!(s.target_count(), 0);
+        let s = s.push_target("10.0.0.0/30".parse().unwrap());
+        assert_eq!(s.target_count(), 1);
+        assert_eq!(s.total_addresses(), 4);
+        let s = s.push_target("192.168.0.1".parse().unwrap());
+        assert_eq!(s.target_count(), 2);
+        assert_eq!(s.total_addresses(), 5);
+    }
+
+    #[test]
     fn total_addresses_and_ports_match_total_probes() {
         let s = Scanner::new(
             vec!["10.0.0.0/29".parse().unwrap()],
