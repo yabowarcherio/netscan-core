@@ -33,3 +33,6 @@ The main threats we care about:
 Please email **yabowarcher8590@gmail.com** with a subject prefix of
 `[netscan-core security]`. Public issue trackers are for feature requests
 and non-security bugs.
+
+We aim for a first reply within 5 business days and a patched release within
+30 days for anything with a reproducible impact.
