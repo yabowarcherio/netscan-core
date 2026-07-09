@@ -33,5 +33,6 @@ pass. Please make them green before requesting review.
 
 ## Commit messages
 
-Conventional prefixes (`feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`)
-please. Keep the subject under 72 chars and put the "why" in the body.
+Conventional prefixes (`feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`,
+`ci:`, `bench:`) please. Keep the subject under 72 chars and put the "why" in
+the body.
