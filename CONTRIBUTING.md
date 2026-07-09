@@ -25,10 +25,11 @@ it belongs here or in a new companion crate.
 cargo fmt --all
 cargo clippy --all-targets --all-features -- -D warnings
 cargo test --all-features
+cargo test --doc --all-features
 ```
 
-CI runs the same checks plus MSRV and doc builds. Please make them green
-before requesting review.
+CI runs the same checks plus MSRV, doc builds, and a cargo-deny advisories
+pass. Please make them green before requesting review.
 
 ## Commit messages
 
