@@ -17,7 +17,9 @@ it belongs here or in a new companion crate.
   budget; the CLI adds `clap` + `serde_json`. Anything new should earn its
   weight.
 - **Tests must not require the network.** Use ephemeral loopback listeners
-  (see `tests/cli.rs` / `lib.rs`) and `127.0.0.1:1` as a "closed" port.
+  (see `tests/cli.rs` / `lib.rs`) and `127.0.0.1:1` as a "closed" port. If a
+  test genuinely can't be written without host-specific network state, mark
+  it `#[ignore]` with a comment explaining why.
 
 ## Local checks
 
