@@ -28,6 +28,8 @@ jobs:
         run: cargo test --all-features
       - name: Library-only build (no CLI feature)
         run: cargo build --no-default-features
+      - name: Doc-tests
+        run: cargo test --doc --all-features
 
   lint:
     name: Format & Clippy
