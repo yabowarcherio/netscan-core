@@ -1,2 +1,12 @@
 /target
 Cargo.lock
+
+# Editor scratch files
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# OS junk
+.DS_Store
+Thumbs.db
