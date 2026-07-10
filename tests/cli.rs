@@ -112,14 +112,7 @@ fn limit_zero_means_unlimited() {
 fn sort_unknown_exits_two() {
     let (code, _, err) = run({
         let mut c = bin();
-        c.args([
-            "--dry-run",
-            "--sort",
-            "size",
-            "10.0.0.1",
-            "--ports",
-            "22",
-        ]);
+        c.args(["--dry-run", "--sort", "size", "10.0.0.1", "--ports", "22"]);
         c
     });
     assert_eq!(code, 2);
@@ -150,14 +143,7 @@ fn report_all_recognized() {
     // it must not fail parsing either.
     let (code, _, _) = run({
         let mut c = bin();
-        c.args([
-            "--dry-run",
-            "--report",
-            "all",
-            "10.0.0.1",
-            "--ports",
-            "22",
-        ]);
+        c.args(["--dry-run", "--report", "all", "10.0.0.1", "--ports", "22"]);
         c
     });
     assert_eq!(code, 0);
@@ -167,7 +153,14 @@ fn report_all_recognized() {
 fn quiet_flag_conflicts_with_json() {
     let (code, _, err) = run({
         let mut c = bin();
-        c.args(["--dry-run", "--quiet", "--json", "10.0.0.1", "--ports", "22"]);
+        c.args([
+            "--dry-run",
+            "--quiet",
+            "--json",
+            "10.0.0.1",
+            "--ports",
+            "22",
+        ]);
         c
     });
     assert_eq!(code, 2);

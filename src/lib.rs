@@ -101,7 +101,9 @@ impl Scanner {
     /// Assumes the worst case where every probe times out — real scans are
     /// typically much faster because open ports respond within a few ms.
     pub fn estimated_duration(&self) -> Duration {
-        let batches = self.total_probes().div_ceil(self.concurrency.max(1) as u128);
+        let batches = self
+            .total_probes()
+            .div_ceil(self.concurrency.max(1) as u128);
         // Saturating math: a caller with 1e9 probes should get a large, but
         // not wrapped, estimate.
         let secs = (batches as u64).saturating_mul(self.timeout.as_secs().max(1));
@@ -314,9 +316,12 @@ pub fn dead_count(results: &[HostResult]) -> usize {
 /// Ties are broken by the address's natural order, and an empty slice yields
 /// `None`.
 pub fn top_host(results: &[HostResult]) -> Option<&HostResult> {
-    results
-        .iter()
-        .max_by(|a, b| a.open_ports.len().cmp(&b.open_ports.len()).then(b.addr.cmp(&a.addr)))
+    results.iter().max_by(|a, b| {
+        a.open_ports
+            .len()
+            .cmp(&b.open_ports.len())
+            .then(b.addr.cmp(&a.addr))
+    })
 }
 
 /// Count how many hosts in a batch responded on at least one port.
@@ -445,11 +450,7 @@ pub const DEFAULT_WAKE_INTERVAL: Duration = Duration::from_millis(100);
 ///
 /// Some BIOSes need 2-3 packets before the NIC reacts. `n` is treated as at
 /// least 1.
-pub async fn wake_repeat(
-    mac: [u8; 6],
-    n: u32,
-    interval: Duration,
-) -> std::io::Result<()> {
+pub async fn wake_repeat(mac: [u8; 6], n: u32, interval: Duration) -> std::io::Result<()> {
     let n = n.max(1);
     for i in 0..n {
         wake(mac).await?;
@@ -632,7 +633,10 @@ mod tests {
         );
         assert_eq!(s.total_addresses(), 8);
         assert_eq!(s.total_ports(), 2);
-        assert_eq!(s.total_probes(), u128::from(s.total_ports()) * s.total_addresses());
+        assert_eq!(
+            s.total_probes(),
+            u128::from(s.total_ports()) * s.total_addresses()
+        );
     }
 
     #[test]
@@ -724,7 +728,11 @@ mod tests {
 
     #[test]
     fn probe_status_as_str_matches_display() {
-        for s in [ProbeStatus::Open, ProbeStatus::Closed, ProbeStatus::Filtered] {
+        for s in [
+            ProbeStatus::Open,
+            ProbeStatus::Closed,
+            ProbeStatus::Filtered,
+        ] {
             assert_eq!(s.as_str(), s.to_string());
         }
     }

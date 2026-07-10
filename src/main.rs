@@ -91,10 +91,16 @@ fn parse_targets(raw: &[String]) -> Result<Vec<IpSet>, String> {
 fn run(cli: Cli) -> Result<(), String> {
     // --wake short-circuits: skip target/port validation entirely.
     if !cli.report.eq_ignore_ascii_case("alive") && !cli.report.eq_ignore_ascii_case("all") {
-        return Err(format!("--report expects 'alive' or 'all', got {:?}", cli.report));
+        return Err(format!(
+            "--report expects 'alive' or 'all', got {:?}",
+            cli.report
+        ));
     }
     if !cli.sort.eq_ignore_ascii_case("addr") && !cli.sort.eq_ignore_ascii_case("ports") {
-        return Err(format!("--sort expects 'addr' or 'ports', got {:?}", cli.sort));
+        return Err(format!(
+            "--sort expects 'addr' or 'ports', got {:?}",
+            cli.sort
+        ));
     }
 
     if !cli.wake.is_empty() {
@@ -151,7 +157,12 @@ fn run(cli: Cli) -> Result<(), String> {
     if cli.sort.eq_ignore_ascii_case("ports") {
         // Descending by number of open ports, ties broken by address for
         // deterministic output.
-        results.sort_by(|a, b| b.open_ports.len().cmp(&a.open_ports.len()).then(a.addr.cmp(&b.addr)));
+        results.sort_by(|a, b| {
+            b.open_ports
+                .len()
+                .cmp(&a.open_ports.len())
+                .then(a.addr.cmp(&b.addr))
+        });
     }
     if cli.limit > 0 && results.len() > cli.limit {
         results.truncate(cli.limit);
