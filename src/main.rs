@@ -89,6 +89,8 @@ struct Cli {
     wake_repeat: u32,
 
     /// With --wake --wake-repeat, pause this many ms between sends.
+    ///
+    /// Ignored when --wake-repeat is 1 (the default).
     #[arg(long, value_name = "MS", default_value_t = 100, requires = "wake")]
     wake_interval_ms: u64,
 }
