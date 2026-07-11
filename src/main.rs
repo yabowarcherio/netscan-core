@@ -3,6 +3,7 @@
 //! ```text
 //! netscan 192.168.1.0/24 --ports ssh,http,https,8000-8100
 //! netscan 10.0.0.1-10.0.0.50 --ports 22,80 --json
+//! netscan --wake AA:BB:CC:DD:EE:FF --wake-repeat 3 --wake-interval-ms 200
 //! ```
 
 use std::process::ExitCode;
