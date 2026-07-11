@@ -41,6 +41,11 @@ struct Cli {
     /// Only print the total number of probes and exit, without scanning.
     #[arg(long)]
     dry_run: bool,
+
+    /// Send a Wake-on-LAN magic packet to each MAC (repeatable), then exit.
+    /// Scanning targets are ignored when --wake is set.
+    #[arg(long, value_name = "MAC", num_args = 1..)]
+    wake: Vec<String>,
 }
 
 fn parse_targets(raw: &[String]) -> Result<Vec<IpSet>, String> {
@@ -50,6 +55,28 @@ fn parse_targets(raw: &[String]) -> Result<Vec<IpSet>, String> {
 }
 
 fn run(cli: Cli) -> Result<(), String> {
+    // --wake short-circuits: skip target/port validation entirely.
+    if !cli.wake.is_empty() {
+        let macs: Vec<[u8; 6]> = cli
+            .wake
+            .iter()
+            .map(|s| wol_rs::parse_mac(s).map_err(|e| format!("{s:?}: {e}")))
+            .collect::<Result<_, _>>()?;
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .map_err(|e| format!("runtime: {e}"))?;
+        rt.block_on(async {
+            for mac in macs {
+                netscan_core::wake(mac)
+                    .await
+                    .map_err(|e| format!("wake {}: {e}", wol_rs::format_mac(mac)))?;
+            }
+            Ok::<(), String>(())
+        })?;
+        return Ok(());
+    }
+
     let targets = parse_targets(&cli.targets)?;
     let ports: PortSpec = cli.ports.parse().map_err(|e| format!("--ports: {e}"))?;
 
