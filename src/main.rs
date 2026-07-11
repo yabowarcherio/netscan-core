@@ -80,6 +80,14 @@ struct Cli {
     /// Scanning targets are ignored when --wake is set.
     #[arg(long, value_name = "MAC", num_args = 1..)]
     wake: Vec<String>,
+
+    /// With --wake, send the packet N times per MAC (some BIOSes need 2-3).
+    #[arg(long, value_name = "N", default_value_t = 1, requires = "wake")]
+    wake_repeat: u32,
+
+    /// With --wake --wake-repeat, pause this many ms between sends.
+    #[arg(long, value_name = "MS", default_value_t = 100, requires = "wake")]
+    wake_interval_ms: u64,
 }
 
 fn parse_targets(raw: &[String]) -> Result<Vec<IpSet>, String> {
