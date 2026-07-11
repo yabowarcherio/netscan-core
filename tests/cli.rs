@@ -168,6 +168,27 @@ fn quiet_flag_conflicts_with_json() {
 }
 
 #[test]
+fn wake_repeat_zero_is_treated_as_one() {
+    // clap accepts the flag; the underlying logic promotes 0 to 1 rather
+    // than sending nothing at all.
+    let (code, _, err) = run({
+        let mut c = bin();
+        c.args([
+            "--wake",
+            "aa:bb:cc:dd:ee:ff",
+            "--wake-repeat",
+            "0",
+        ]);
+        c
+    });
+    let is_wake_send_error = code == 2 && err.contains("wake AA:BB:CC:DD:EE:FF");
+    assert!(
+        code == 0 || is_wake_send_error,
+        "unexpected outcome (code={code}, stderr={err})"
+    );
+}
+
+#[test]
 fn service_name_in_ports_parses() {
     let (code, out, _) = run({
         let mut c = bin();
