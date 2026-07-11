@@ -168,6 +168,24 @@ fn quiet_flag_conflicts_with_json() {
 }
 
 #[test]
+fn wake_interval_ms_requires_wake() {
+    let (code, _, err) = run({
+        let mut c = bin();
+        c.args([
+            "--dry-run",
+            "--wake-interval-ms",
+            "50",
+            "10.0.0.1",
+            "--ports",
+            "22",
+        ]);
+        c
+    });
+    assert_eq!(code, 2);
+    assert!(err.contains("--wake") || err.contains("requires"));
+}
+
+#[test]
 fn wake_repeat_requires_wake() {
     // --wake-repeat without --wake is a clap error, exit 2.
     let (code, _, err) = run({
