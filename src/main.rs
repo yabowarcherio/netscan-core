@@ -82,7 +82,9 @@ struct Cli {
     #[arg(long, value_name = "MAC", num_args = 1..)]
     wake: Vec<String>,
 
-    /// With --wake, send the packet N times per MAC (some BIOSes need 2-3).
+    /// With --wake, send the packet N times per MAC.
+    ///
+    /// Some BIOSes need 2-3 packets before the NIC reacts. 0 is treated as 1.
     #[arg(long, value_name = "N", default_value_t = 1, requires = "wake")]
     wake_repeat: u32,
 
