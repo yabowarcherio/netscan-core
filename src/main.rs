@@ -121,9 +121,11 @@ fn run(cli: Cli) -> Result<(), String> {
             .enable_all()
             .build()
             .map_err(|e| format!("runtime: {e}"))?;
+        let interval = std::time::Duration::from_millis(cli.wake_interval_ms);
+        let repeats = cli.wake_repeat.max(1);
         rt.block_on(async {
             for mac in macs {
-                netscan_core::wake(mac)
+                netscan_core::wake_repeat(mac, repeats, interval)
                     .await
                     .map_err(|e| format!("wake {}: {e}", wol_rs::format_mac(mac)))?;
             }
