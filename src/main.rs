@@ -128,6 +128,9 @@ fn run(cli: Cli) -> Result<(), String> {
             .map_err(|e| format!("runtime: {e}"))?;
         let interval = std::time::Duration::from_millis(cli.wake_interval_ms);
         let repeats = cli.wake_repeat.max(1);
+        if repeats == 1 && cli.wake_interval_ms != 100 {
+            eprintln!("netscan: --wake-interval-ms is ignored when --wake-repeat=1");
+        }
         rt.block_on(async {
             for mac in macs {
                 netscan_core::wake_repeat(mac, repeats, interval)
