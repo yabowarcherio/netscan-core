@@ -662,6 +662,19 @@ mod tests {
     }
 
     #[test]
+    fn alive_dead_split_matches_individual_counts() {
+        let a = HostResult {
+            addr: "10.0.0.1".parse().unwrap(),
+            open_ports: vec![22],
+        };
+        let b = HostResult::new("10.0.0.2".parse().unwrap());
+        let batch = [a, b];
+        let (alive, dead) = alive_dead_split(&batch);
+        assert_eq!(alive, alive_count(&batch));
+        assert_eq!(dead, dead_count(&batch));
+    }
+
+    #[test]
     fn dead_and_alive_counts_partition_the_batch() {
         let a = HostResult {
             addr: "10.0.0.1".parse().unwrap(),
