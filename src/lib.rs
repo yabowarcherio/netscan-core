@@ -668,6 +668,21 @@ mod tests {
     }
 
     #[test]
+    fn total_open_port_hits_sums_with_multiplicity() {
+        let a = HostResult {
+            addr: "10.0.0.1".parse().unwrap(),
+            open_ports: vec![22, 80],
+        };
+        let b = HostResult {
+            addr: "10.0.0.2".parse().unwrap(),
+            open_ports: vec![22],
+        };
+        // 22 appears on both hosts but is still counted twice — that's the
+        // point of the "hits" name.
+        assert_eq!(total_open_port_hits(&[a, b]), 3);
+    }
+
+    #[test]
     fn alive_dead_split_matches_individual_counts() {
         let a = HostResult {
             addr: "10.0.0.1".parse().unwrap(),
