@@ -306,6 +306,12 @@ pub fn dead_hosts(results: &[HostResult]) -> impl Iterator<Item = &HostResult> {
     results.iter().filter(|r| !r.is_alive())
 }
 
+/// Split a batch into (alive, dead) counts in one linear pass.
+pub fn alive_dead_split(results: &[HostResult]) -> (usize, usize) {
+    let alive = alive_count(results);
+    (alive, results.len() - alive)
+}
+
 /// Count how many hosts in a batch had zero open ports.
 pub fn dead_count(results: &[HostResult]) -> usize {
     dead_hosts(results).count()
