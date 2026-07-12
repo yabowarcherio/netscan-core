@@ -101,6 +101,12 @@ fn parse_targets(raw: &[String]) -> Result<Vec<IpSet>, String> {
         .collect()
 }
 
+fn parse_macs(raw: &[String]) -> Result<Vec<[u8; 6]>, String> {
+    raw.iter()
+        .map(|s| wol_rs::parse_mac(s).map_err(|e| format!("{s:?}: {e}")))
+        .collect()
+}
+
 fn run(cli: Cli) -> Result<(), String> {
     // --wake short-circuits: skip target/port validation entirely.
     if !cli.report.eq_ignore_ascii_case("alive") && !cli.report.eq_ignore_ascii_case("all") {
@@ -117,11 +123,7 @@ fn run(cli: Cli) -> Result<(), String> {
     }
 
     if !cli.wake.is_empty() {
-        let macs: Vec<[u8; 6]> = cli
-            .wake
-            .iter()
-            .map(|s| wol_rs::parse_mac(s).map_err(|e| format!("{s:?}: {e}")))
-            .collect::<Result<_, _>>()?;
+        let macs = parse_macs(&cli.wake)?;
         let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
