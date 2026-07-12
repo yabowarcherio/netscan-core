@@ -19,7 +19,7 @@ use portspec::PortSpec;
 #[command(name = "netscan", version, about)]
 struct Cli {
     /// One or more targets: CIDR block, address range, or bare address.
-    #[arg(value_name = "TARGET", required = true)]
+    #[arg(value_name = "TARGET", required_unless_present = "wake")]
     targets: Vec<String>,
 
     /// Ports to probe (any format PortSpec accepts, incl. service names).
