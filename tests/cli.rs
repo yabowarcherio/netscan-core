@@ -168,6 +168,19 @@ fn quiet_flag_conflicts_with_json() {
 }
 
 #[test]
+fn json_dry_run_probes_matches_grid() {
+    let (code, out, _) = run({
+        let mut c = bin();
+        c.args(["--dry-run", "--json", "10.0.0.0/28", "--ports", "22,80,443"]);
+        c
+    });
+    assert_eq!(code, 0);
+    let v: serde_json::Value = serde_json::from_str(out.trim()).unwrap();
+    // 16 addresses × 3 ports.
+    assert_eq!(v["probes"], serde_json::json!(48));
+}
+
+#[test]
 fn wake_interval_ms_requires_wake() {
     let (code, _, err) = run({
         let mut c = bin();
