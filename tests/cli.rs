@@ -168,6 +168,19 @@ fn quiet_flag_conflicts_with_json() {
 }
 
 #[test]
+fn help_and_version_succeed() {
+    for flag in ["--help", "-h", "--version", "-V"] {
+        let (code, out, _) = run({
+            let mut c = bin();
+            c.arg(flag);
+            c
+        });
+        assert_eq!(code, 0, "{flag} should succeed");
+        assert!(!out.is_empty(), "{flag} should print something");
+    }
+}
+
+#[test]
 fn json_dry_run_probes_matches_grid() {
     let (code, out, _) = run({
         let mut c = bin();
