@@ -312,6 +312,12 @@ pub fn alive_dead_split(results: &[HostResult]) -> (usize, usize) {
     (alive, results.len() - alive)
 }
 
+/// Total open-port count across every host in the batch. Repeats between
+/// hosts count separately; use [`distinct_open_ports`] for the deduped set.
+pub fn total_open_port_hits(results: &[HostResult]) -> usize {
+    results.iter().map(|r| r.open_ports.len()).sum()
+}
+
 /// Count how many hosts in a batch had zero open ports.
 pub fn dead_count(results: &[HostResult]) -> usize {
     dead_hosts(results).count()
