@@ -9,7 +9,7 @@
 use std::process::ExitCode;
 
 use clap::Parser;
-use netscan_core::{alive_count, Scanner, DEFAULT_CONCURRENCY, DEFAULT_TIMEOUT};
+use netscan_core::{alive_count, dead_count, Scanner, DEFAULT_CONCURRENCY, DEFAULT_TIMEOUT};
 
 use cidr_utils::IpSet;
 use portspec::PortSpec;
@@ -216,7 +216,12 @@ fn run(cli: Cli) -> Result<(), String> {
                 println!("{}\t{ports}", r.addr);
             }
         }
-        eprintln!("# alive: {} / {}", alive_count(&results), results.len());
+        eprintln!(
+            "# alive: {} / {} (dead: {})",
+            alive_count(&results),
+            results.len(),
+            dead_count(&results)
+        );
     }
     Ok(())
 }
