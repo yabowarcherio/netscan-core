@@ -318,6 +318,18 @@ pub fn total_open_port_hits(results: &[HostResult]) -> usize {
     results.iter().map(|r| r.open_ports.len()).sum()
 }
 
+/// The single most-common open port across the batch, or `None` if no host
+/// answered on anything.
+pub fn most_common_open_port(results: &[HostResult]) -> Option<u16> {
+    let mut counts: std::collections::HashMap<u16, usize> = Default::default();
+    for r in results {
+        for p in &r.open_ports {
+            *counts.entry(*p).or_insert(0) += 1;
+        }
+    }
+    counts.into_iter().max_by_key(|(_, c)| *c).map(|(p, _)| p)
+}
+
 /// Count how many hosts in a batch had zero open ports.
 pub fn dead_count(results: &[HostResult]) -> usize {
     dead_hosts(results).count()
