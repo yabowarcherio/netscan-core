@@ -330,6 +330,17 @@ pub fn most_common_open_port(results: &[HostResult]) -> Option<u16> {
     counts.into_iter().max_by_key(|(_, c)| *c).map(|(p, _)| p)
 }
 
+/// Filter results whose address matches a caller-supplied predicate.
+///
+/// Handy for slicing an IPv6-heavy scan down to just its IPv4 half, or the
+/// reverse.
+pub fn filter_by_addr<F>(results: &[HostResult], pred: F) -> Vec<&HostResult>
+where
+    F: Fn(&IpAddr) -> bool,
+{
+    results.iter().filter(|r| pred(&r.addr)).collect()
+}
+
 /// Group results by their open-port count, keyed on the count.
 ///
 /// Useful for histograms — most hosts have 0 open ports, a few have 1-3,
