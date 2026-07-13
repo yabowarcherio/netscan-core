@@ -54,6 +54,29 @@ fn bad_target_exits_two() {
 }
 
 #[test]
+fn wake_needs_no_target() {
+    // --wake short-circuits target parsing; if the MAC is valid the wake
+    // itself succeeds on any host with a loopback (UDP broadcast to itself).
+    let (code, _, err) = run({
+        let mut c = bin();
+        c.args(["--wake", "aa:bb:cc:dd:ee:ff"]);
+        c
+    });
+    assert_eq!(code, 0, "stderr: {err}");
+}
+
+#[test]
+fn wake_bad_mac_exits_two() {
+    let (code, _, err) = run({
+        let mut c = bin();
+        c.args(["--wake", "not-a-mac"]);
+        c
+    });
+    assert_eq!(code, 2);
+    assert!(err.contains("netscan"));
+}
+
+#[test]
 fn service_name_in_ports_parses() {
     let (code, out, _) = run({
         let mut c = bin();
