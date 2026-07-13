@@ -330,6 +330,20 @@ pub fn most_common_open_port(results: &[HostResult]) -> Option<u16> {
     counts.into_iter().max_by_key(|(_, c)| *c).map(|(p, _)| p)
 }
 
+/// Group results by their open-port count, keyed on the count.
+///
+/// Useful for histograms — most hosts have 0 open ports, a few have 1-3,
+/// outliers have dozens.
+pub fn histogram_by_port_count(
+    results: &[HostResult],
+) -> std::collections::BTreeMap<usize, usize> {
+    let mut hist: std::collections::BTreeMap<usize, usize> = Default::default();
+    for r in results {
+        *hist.entry(r.open_ports.len()).or_insert(0) += 1;
+    }
+    hist
+}
+
 /// The top-N most-common open ports across the batch, in descending count
 /// order. Ties break by ascending port number for deterministic output.
 pub fn top_open_ports(results: &[HostResult], n: usize) -> Vec<(u16, usize)> {
