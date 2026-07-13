@@ -680,6 +680,21 @@ mod tests {
     }
 
     #[test]
+    fn most_common_open_port_picks_the_repeat() {
+        let a = HostResult {
+            addr: "10.0.0.1".parse().unwrap(),
+            open_ports: vec![22, 80],
+        };
+        let b = HostResult {
+            addr: "10.0.0.2".parse().unwrap(),
+            open_ports: vec![22],
+        };
+        assert_eq!(most_common_open_port(&[a, b]), Some(22));
+        let empty: [HostResult; 0] = [];
+        assert_eq!(most_common_open_port(&empty), None);
+    }
+
+    #[test]
     fn total_open_port_hits_sums_with_multiplicity() {
         let a = HostResult {
             addr: "10.0.0.1".parse().unwrap(),
