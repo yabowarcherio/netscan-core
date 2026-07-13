@@ -723,6 +723,16 @@ mod tests {
     }
 
     #[test]
+    fn filter_by_addr_slices_ipv4_only() {
+        let a = HostResult::new("10.0.0.1".parse().unwrap());
+        let b = HostResult::new("2001:db8::1".parse().unwrap());
+        let batch = [a, b];
+        let v4: Vec<_> = filter_by_addr(&batch, |a| a.is_ipv4());
+        assert_eq!(v4.len(), 1);
+        assert!(v4[0].addr.is_ipv4());
+    }
+
+    #[test]
     fn histogram_by_port_count_groups_hosts() {
         let a = HostResult {
             addr: "10.0.0.1".parse().unwrap(),
