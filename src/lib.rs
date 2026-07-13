@@ -712,6 +712,22 @@ mod tests {
     }
 
     #[test]
+    fn histogram_by_port_count_groups_hosts() {
+        let a = HostResult {
+            addr: "10.0.0.1".parse().unwrap(),
+            open_ports: vec![22, 80],
+        };
+        let b = HostResult {
+            addr: "10.0.0.2".parse().unwrap(),
+            open_ports: vec![22, 80],
+        };
+        let c = HostResult::new("10.0.0.3".parse().unwrap());
+        let h = histogram_by_port_count(&[a, b, c]);
+        assert_eq!(h.get(&2), Some(&2));
+        assert_eq!(h.get(&0), Some(&1));
+    }
+
+    #[test]
     fn top_open_ports_is_sorted_and_capped() {
         let a = HostResult {
             addr: "10.0.0.1".parse().unwrap(),
