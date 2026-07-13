@@ -341,6 +341,12 @@ where
     results.iter().filter(|r| pred(&r.addr)).collect()
 }
 
+/// Partition results into `(ipv4, ipv6)` slices, borrowing from the input.
+pub fn split_by_family(results: &[HostResult]) -> (Vec<&HostResult>, Vec<&HostResult>) {
+    let (v4, v6): (Vec<_>, Vec<_>) = results.iter().partition(|r| r.addr.is_ipv4());
+    (v4, v6)
+}
+
 /// Group results by their open-port count, keyed on the count.
 ///
 /// Useful for histograms — most hosts have 0 open ports, a few have 1-3,
