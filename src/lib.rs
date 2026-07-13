@@ -698,6 +698,26 @@ mod tests {
     }
 
     #[test]
+    fn top_open_ports_is_sorted_and_capped() {
+        let a = HostResult {
+            addr: "10.0.0.1".parse().unwrap(),
+            open_ports: vec![22, 80, 443],
+        };
+        let b = HostResult {
+            addr: "10.0.0.2".parse().unwrap(),
+            open_ports: vec![22, 80],
+        };
+        let c = HostResult {
+            addr: "10.0.0.3".parse().unwrap(),
+            open_ports: vec![22],
+        };
+        let top = top_open_ports(&[a, b, c], 2);
+        assert_eq!(top, vec![(22, 3), (80, 2)]);
+        assert!(top_open_ports(&[], 5).is_empty());
+        assert!(top_open_ports(&[HostResult::new("10.0.0.1".parse().unwrap())], 0).is_empty());
+    }
+
+    #[test]
     fn most_common_open_port_picks_the_repeat() {
         let a = HostResult {
             addr: "10.0.0.1".parse().unwrap(),
