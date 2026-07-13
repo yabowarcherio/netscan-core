@@ -330,6 +330,24 @@ pub fn most_common_open_port(results: &[HostResult]) -> Option<u16> {
     counts.into_iter().max_by_key(|(_, c)| *c).map(|(p, _)| p)
 }
 
+/// The top-N most-common open ports across the batch, in descending count
+/// order. Ties break by ascending port number for deterministic output.
+pub fn top_open_ports(results: &[HostResult], n: usize) -> Vec<(u16, usize)> {
+    if n == 0 {
+        return Vec::new();
+    }
+    let mut counts: std::collections::HashMap<u16, usize> = Default::default();
+    for r in results {
+        for p in &r.open_ports {
+            *counts.entry(*p).or_insert(0) += 1;
+        }
+    }
+    let mut v: Vec<(u16, usize)> = counts.into_iter().collect();
+    v.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
+    v.truncate(n);
+    v
+}
+
 /// Count how many hosts in a batch had zero open ports.
 pub fn dead_count(results: &[HostResult]) -> usize {
     dead_hosts(results).count()
