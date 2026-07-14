@@ -184,6 +184,10 @@ impl Scanner {
     /// The returned receiver closes when every probe has been reported. This
     /// is the low-latency alternative to [`Scanner::run`], useful when a UI
     /// wants to display results as they arrive.
+    ///
+    /// The channel is unbounded — a slow consumer will backlog memory. For
+    /// tight backpressure, wrap the receiver in a bounded channel of your
+    /// own or use [`Scanner::run`] for the complete-batch API.
     pub fn stream(&self) -> mpsc::UnboundedReceiver<(SocketAddr, ProbeStatus)> {
         let (tx, rx) = mpsc::unbounded_channel();
         let sem = Arc::new(Semaphore::new(self.concurrency));
