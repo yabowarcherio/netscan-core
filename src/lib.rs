@@ -58,6 +58,9 @@ pub const DEFAULT_STREAM_BUFFER: usize = 128;
 
 /// A curated short list of ports that a "quick scan" typically hits — SSH,
 /// HTTP, HTTPS, RDP. Matches the CLI's default `--ports` value.
+///
+/// Deliberately tiny; use [`WEB_PORTS`] / [`SHELL_PORTS`] / [`DB_PORTS`] for
+/// per-role expansions.
 pub const QUICK_PORTS: &[u16] = &[22, 80, 443, 3389];
 
 /// The set of ports commonly enumerated as "web" services.
