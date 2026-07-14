@@ -51,6 +51,11 @@ pub const DEFAULT_TIMEOUT: Duration = Duration::from_millis(1500);
 /// Default number of in-flight connection attempts.
 pub const DEFAULT_CONCURRENCY: usize = 256;
 
+/// Default buffer size handed to [`Scanner::stream_bounded`] when the caller
+/// doesn't override it. Small enough to backpressure quickly, large enough
+/// to keep the sender busy on a 1-Gbps link.
+pub const DEFAULT_STREAM_BUFFER: usize = 128;
+
 /// A curated short list of ports that a "quick scan" typically hits — SSH,
 /// HTTP, HTTPS, RDP. Matches the CLI's default `--ports` value.
 pub const QUICK_PORTS: &[u16] = &[22, 80, 443, 3389];
