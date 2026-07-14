@@ -23,7 +23,7 @@ use std::time::Duration;
 use cidr_utils::IpSet;
 use portspec::PortSpec;
 use tokio::net::TcpStream;
-use tokio::sync::Semaphore;
+use tokio::sync::{mpsc, Semaphore};
 use tokio::time::timeout;
 
 pub use cidr_utils;
@@ -86,6 +86,37 @@ impl Scanner {
             t.addresses()
                 .flat_map(move |a| self.ports.iter().map(move |p| SocketAddr::new(a, p)))
         })
+    }
+
+    /// Spawn every probe concurrently (bounded by `concurrency`) and stream
+    /// each `(SocketAddr, ProbeStatus)` result as soon as it lands.
+    ///
+    /// The returned receiver closes when every probe has been reported. This
+    /// is the low-latency alternative to [`Scanner::run`], useful when a UI
+    /// wants to display results as they arrive.
+    pub fn stream(&self) -> mpsc::UnboundedReceiver<(SocketAddr, ProbeStatus)> {
+        let (tx, rx) = mpsc::unbounded_channel();
+        let sem = Arc::new(Semaphore::new(self.concurrency));
+        let timeout_dur = self.timeout;
+        // Materialize the probe list so we can move it into the runner task
+        // without keeping `&self` alive across await points.
+        let probes: Vec<SocketAddr> = self.probes().collect();
+        tokio::spawn(async move {
+            let mut handles = Vec::with_capacity(probes.len());
+            for sock in probes {
+                let sem = Arc::clone(&sem);
+                let tx = tx.clone();
+                handles.push(tokio::spawn(async move {
+                    let _permit = sem.acquire_owned().await.expect("semaphore not closed");
+                    let status = probe(sock, timeout_dur).await;
+                    let _ = tx.send((sock, status));
+                }));
+            }
+            for h in handles {
+                let _ = h.await;
+            }
+        });
+        rx
     }
 
     /// Run every probe concurrently (bounded by `concurrency`) and return
@@ -279,6 +310,32 @@ mod tests {
         let status = probe(addr, Duration::from_millis(500)).await;
         handle.abort();
         assert_eq!(status, ProbeStatus::Open);
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+    async fn scanner_stream_reports_open_port_promptly() {
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let port = listener.local_addr().unwrap().port();
+        let accepter = tokio::spawn(async move {
+            for _ in 0..4 {
+                let _ = listener.accept().await;
+            }
+        });
+
+        let target: IpSet = "127.0.0.1".parse().unwrap();
+        let ports: PortSpec = format!("{port}").parse().unwrap();
+        let s = Scanner::new(vec![target], ports).with_timeout(Duration::from_millis(400));
+
+        let mut rx = s.stream();
+        let mut got = Vec::new();
+        while let Some(event) = rx.recv().await {
+            got.push(event);
+        }
+        accepter.abort();
+
+        assert_eq!(got.len(), 1);
+        assert_eq!(got[0].1, ProbeStatus::Open);
+        assert_eq!(got[0].0.port(), port);
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
