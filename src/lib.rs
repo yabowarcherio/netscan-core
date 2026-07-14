@@ -63,6 +63,9 @@ pub const QUICK_PORTS: &[u16] = &[22, 80, 443, 3389];
 /// The set of ports commonly enumerated as "web" services.
 pub const WEB_PORTS: &[u16] = &[80, 443, 8000, 8008, 8080, 8443, 8888];
 
+/// The set of ports commonly enumerated as "remote-shell" services.
+pub const SHELL_PORTS: &[u16] = &[22, 23, 3389, 5900];
+
 /// A single scan configuration.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Hash)]
 pub struct Scanner {
