@@ -178,6 +178,35 @@ impl Scanner {
         })
     }
 
+    /// Bounded-channel variant of [`Scanner::stream`] — drop-in with a caller
+    /// picked buffer size. When the receiver falls behind, the sending tasks
+    /// wait on send instead of piling up memory.
+    pub fn stream_bounded(
+        &self,
+        buffer: usize,
+    ) -> mpsc::Receiver<(SocketAddr, ProbeStatus)> {
+        let (tx, rx) = mpsc::channel(buffer.max(1));
+        let sem = Arc::new(Semaphore::new(self.concurrency));
+        let timeout_dur = self.timeout;
+        let probes: Vec<SocketAddr> = self.probes().collect();
+        tokio::spawn(async move {
+            let mut handles = Vec::with_capacity(probes.len());
+            for sock in probes {
+                let sem = Arc::clone(&sem);
+                let tx = tx.clone();
+                handles.push(tokio::spawn(async move {
+                    let _permit = sem.acquire_owned().await.expect("semaphore not closed");
+                    let status = probe(sock, timeout_dur).await;
+                    let _ = tx.send((sock, status)).await;
+                }));
+            }
+            for h in handles {
+                let _ = h.await;
+            }
+        });
+        rx
+    }
+
     /// Spawn every probe concurrently (bounded by `concurrency`) and stream
     /// each `(SocketAddr, ProbeStatus)` result as soon as it lands.
     ///
