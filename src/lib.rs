@@ -912,6 +912,14 @@ mod tests {
     }
 
     #[test]
+    fn shell_and_db_port_presets_look_right() {
+        assert!(SHELL_PORTS.contains(&22));
+        assert!(SHELL_PORTS.contains(&3389));
+        assert!(DB_PORTS.contains(&5432));
+        assert!(DB_PORTS.contains(&27017));
+    }
+
+    #[test]
     fn empty_scanner_has_zero_probes() {
         let s = Scanner::empty();
         assert!(s.is_empty());
