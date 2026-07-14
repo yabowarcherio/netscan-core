@@ -183,6 +183,12 @@ impl Scanner {
         })
     }
 
+    /// Bounded-channel variant of [`Scanner::stream`] using
+    /// [`DEFAULT_STREAM_BUFFER`].
+    pub fn stream_bounded_default(&self) -> mpsc::Receiver<(SocketAddr, ProbeStatus)> {
+        self.stream_bounded(DEFAULT_STREAM_BUFFER)
+    }
+
     /// Bounded-channel variant of [`Scanner::stream`] — drop-in with a caller
     /// picked buffer size. When the receiver falls behind, the sending tasks
     /// wait on send instead of piling up memory.
