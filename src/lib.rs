@@ -977,6 +977,30 @@ mod tests {
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+    async fn scanner_stream_bounded_delivers_results() {
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let port = listener.local_addr().unwrap().port();
+        let accepter = tokio::spawn(async move {
+            for _ in 0..2 {
+                let _ = listener.accept().await;
+            }
+        });
+        let s = Scanner::new(
+            vec!["127.0.0.1".parse().unwrap()],
+            format!("{port}").parse().unwrap(),
+        )
+        .with_timeout(Duration::from_millis(400));
+        let mut rx = s.stream_bounded(1);
+        let mut got = Vec::new();
+        while let Some(event) = rx.recv().await {
+            got.push(event);
+        }
+        accepter.abort();
+        assert_eq!(got.len(), 1);
+        assert_eq!(got[0].1, ProbeStatus::Open);
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
     async fn scanner_stream_reports_open_port_promptly() {
         let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
         let port = listener.local_addr().unwrap().port();
