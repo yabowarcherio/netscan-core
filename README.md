@@ -19,8 +19,10 @@ custom CLI) sit on top of the engine.
 ## Status
 
 Working. `Scanner::run` does concurrent TCP connect scanning with a bounded
-semaphore; `Scanner::stream` gives a low-latency channel for UIs that want to
-render results as they arrive. WoL is one call away via `netscan_core::wake`.
+semaphore; `Scanner::stream` / `stream_bounded` give low-latency channels
+for UIs that want to render results as they arrive. WoL is one call away
+via `netscan_core::wake` (or `wake_repeat` for BIOSes that need multiple
+packets).
 
 ## Install
 
