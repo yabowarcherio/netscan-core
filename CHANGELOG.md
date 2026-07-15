@@ -6,6 +6,31 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Port-preset slice constants: `QUICK_PORTS`, `WEB_PORTS`, `SHELL_PORTS`,
+  `DB_PORTS`, plus `DEFAULT_STREAM_BUFFER`.
+- Scanner extensions: `Scanner::empty`, `is_empty`, `with_targets`,
+  `with_ports`, `push_target`, `clear_targets`, `target_count`,
+  `total_addresses`, `total_ports`, `estimated_duration`.
+- Streaming variants: `Scanner::stream_bounded`, `Scanner::stream_bounded_default`.
+- Batch helpers: `alive_hosts`, `dead_hosts`, `alive_dead_split`, `alive_count`,
+  `dead_count`, `distinct_open_ports`, `total_open_port_hits`,
+  `most_common_open_port`, `top_open_ports`, `histogram_by_port_count`,
+  `top_host`, `filter_by_addr`, `split_by_family`.
+- Wake helpers: `wake_repeat`, `wake_many`, `wake_many_collect`,
+  `wake_success_count`, `wake_failure_count`, `PROBE_MIN_TIMEOUT`,
+  `PROBE_MAX_TIMEOUT`, `DEFAULT_WAKE_REPEATS`, `DEFAULT_WAKE_INTERVAL`.
+- Enriched-host accessors: `EnrichedHost::is_alive`, `addr`, `open_ports`,
+  `set_vendor`, `has_vendor`.
+- ProbeStatus predicates: `is_open`, `is_closed`, `is_filtered`, `as_str`,
+  `Display`.
+- CLI: `--quiet`, `--report`, `--sort`, `--limit`, `--wake-repeat`,
+  `--wake-interval-ms`, stderr alive/dead tally.
+- Release workflow (per-target binaries on tag push), Dependabot for
+  cargo + GitHub Actions, cargo-deny advisories job, CODEOWNERS, PR/issue
+  templates.
+
 ## [0.1.0]
 
 Initial release. The scanner works end-to-end.
