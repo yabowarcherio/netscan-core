@@ -18,8 +18,9 @@ custom CLI) sit on top of the engine.
 
 ## Status
 
-**Very early.** The `Scanner` type is settled, `--dry-run` prints the plan,
-but live TCP connect probing lands in a later commit. Track the CHANGELOG.
+Working. `Scanner::run` does concurrent TCP connect scanning with a bounded
+semaphore; `Scanner::stream` gives a low-latency channel for UIs that want to
+render results as they arrive. WoL is one call away via `netscan_core::wake`.
 
 ## Install
 
@@ -43,19 +44,41 @@ tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 netscan 192.168.1.0/24 --ports ssh,http,https,8000-8100
 netscan 10.0.0.1-10.0.0.50 --ports 22,80 --json
 netscan 192.168.1.0/24 --dry-run          # print the plan without scanning
+netscan --wake AA:BB:CC:DD:EE:FF          # send a Wake-on-LAN packet, no scan
 ```
 
 ## Usage (library)
 
-```rust
-use netscan_core::Scanner;
-use cidr_utils::IpSet;
-use portspec::PortSpec;
+```rust,no_run
+use netscan_core::{Scanner, cidr_utils::IpSet, portspec::PortSpec};
 
-let targets: Vec<IpSet> = vec!["192.168.1.0/24".parse().unwrap()];
-let ports: PortSpec = "ssh,http,https".parse().unwrap();
-let scanner = Scanner::new(targets, ports);
-println!("planned probes: {}", scanner.total_probes());
+#[tokio::main]
+async fn main() {
+    let targets: Vec<IpSet> = vec!["192.168.1.0/24".parse().unwrap()];
+    let ports: PortSpec = "ssh,http,https".parse().unwrap();
+    let scanner = Scanner::new(targets, ports);
+    let results = scanner.run().await;
+    for r in results.iter().filter(|r| r.is_alive()) {
+        println!("{} -> {:?}", r.addr, r.open_ports);
+    }
+}
+```
+
+Or stream results as they come in:
+
+```rust,no_run
+use netscan_core::{Scanner, cidr_utils::IpSet, portspec::PortSpec, ProbeStatus};
+
+#[tokio::main]
+async fn main() {
+    let s = Scanner::new(vec!["192.168.1.0/24".parse().unwrap()], "22".parse().unwrap());
+    let mut rx = s.stream();
+    while let Some((sock, status)) = rx.recv().await {
+        if status == ProbeStatus::Open {
+            println!("{sock} open");
+        }
+    }
+}
 ```
 
 ## Why another scanner?
