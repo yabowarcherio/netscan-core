@@ -118,3 +118,10 @@ Where NetScan aims to be better:
 ## License
 
 Dual-licensed under [Apache-2.0](LICENSE-APACHE) OR [MIT](LICENSE-MIT).
+
+## Related crates
+
+- [oui-lookup](https://github.com/yabowarcherio/oui-lookup) — offline MAC → vendor
+- [cidr-utils](https://github.com/yabowarcherio/cidr-utils) — CIDR / range / set math
+- [portspec](https://github.com/yabowarcherio/portspec) — port-list parser
+- [wol-rs](https://github.com/yabowarcherio/wol-rs) — Wake-on-LAN magic packets
