@@ -90,6 +90,17 @@ async fn main() {
 }
 ```
 
+## Batch helpers
+
+The library ships a small kit of batch-analysis helpers on top of
+`Vec<HostResult>`:
+
+- `alive_hosts` / `dead_hosts` / `alive_dead_split`
+- `alive_count` / `dead_count` / `count_known` (via oui-lookup)
+- `distinct_open_ports` / `total_open_port_hits`
+- `most_common_open_port` / `top_open_ports` / `histogram_by_port_count`
+- `filter_by_addr` / `split_by_family` / `top_host`
+
 ## Why another scanner?
 
 nmap wins on depth of service/OS fingerprinting — don't try to out-nmap nmap.
