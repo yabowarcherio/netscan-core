@@ -110,6 +110,7 @@ Where NetScan aims to be better:
 - **Truly free + OSS + zero telemetry.**
 - Fast async scanning, single static binary, no .NET/Java runtime.
 - The Windows-shop conveniences (SMB shares, WoL, RDP/SSH launch) built in.
+- Streaming output for TUIs and desktop UIs.
 
 ## License
 
