@@ -47,6 +47,9 @@ netscan 192.168.1.0/24 --ports ssh,http,https,8000-8100
 netscan 10.0.0.1-10.0.0.50 --ports 22,80 --json
 netscan 192.168.1.0/24 --dry-run          # print the plan without scanning
 netscan --wake AA:BB:CC:DD:EE:FF          # send a Wake-on-LAN packet, no scan
+netscan --wake AA:BB:CC:DD:EE:FF --wake-repeat 3 --wake-interval-ms 200
+netscan 10.0.0.0/24 --sort ports --limit 5     # top-5 hosts by open ports
+netscan 10.0.0.0/24 --report all --quiet       # write only errors + tally
 ```
 
 ## Usage (library)
