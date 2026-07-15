@@ -64,6 +64,13 @@ async fn main() {
 }
 ```
 
+Preset port lists are exposed as `&'static [u16]` slices:
+
+```rust
+use netscan_core::{QUICK_PORTS, WEB_PORTS, SHELL_PORTS, DB_PORTS};
+assert!(QUICK_PORTS.contains(&22));
+```
+
 Or stream results as they come in:
 
 ```rust,no_run
