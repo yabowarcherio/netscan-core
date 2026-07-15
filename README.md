@@ -1,5 +1,9 @@
 # netscan-core
 
+<!-- badges -->
+[![crate](https://img.shields.io/crates/v/netscan-core.svg)](https://crates.io/crates/netscan-core)
+[![docs](https://docs.rs/netscan-core/badge.svg)](https://docs.rs/netscan-core)
+
 [![CI](https://github.com/yabowarcherio/netscan-core/actions/workflows/ci.yml/badge.svg)](https://github.com/yabowarcherio/netscan-core/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 
