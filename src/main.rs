@@ -29,6 +29,9 @@ struct Cli {
     targets: Vec<String>,
 
     /// Ports to probe (any format PortSpec accepts, incl. service names).
+    ///
+    /// Also accepts a preset name via `preset:NAME` — see the CLI --help
+    /// for the full list.
     #[arg(long, short = 'p', default_value = "22,80,443,3389")]
     ports: String,
 
