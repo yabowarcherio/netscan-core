@@ -72,6 +72,9 @@ pub const SHELL_PORTS: &[u16] = &[22, 23, 3389, 5900];
 /// The set of ports commonly enumerated as "database" services.
 pub const DB_PORTS: &[u16] = &[1433, 3306, 5432, 6379, 27017, 9042, 9200, 11211];
 
+/// The set of ports commonly enumerated as "mail" services.
+pub const MAIL_PORTS: &[u16] = &[25, 110, 143, 465, 587, 993, 995];
+
 /// A single scan configuration.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Hash)]
 pub struct Scanner {
