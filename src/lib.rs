@@ -929,6 +929,14 @@ mod tests {
     }
 
     #[test]
+    fn mail_and_file_port_presets_look_right() {
+        assert!(MAIL_PORTS.contains(&25));
+        assert!(MAIL_PORTS.contains(&993));
+        assert!(FILE_PORTS.contains(&445));
+        assert!(FILE_PORTS.contains(&2049));
+    }
+
+    #[test]
     fn empty_scanner_has_zero_probes() {
         let s = Scanner::empty();
         assert!(s.is_empty());
