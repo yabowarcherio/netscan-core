@@ -148,7 +148,19 @@ fn run(cli: Cli) -> Result<(), String> {
     }
 
     let targets = parse_targets(&cli.targets)?;
-    let ports: PortSpec = cli.ports.parse().map_err(|e| format!("--ports: {e}"))?;
+    let ports: PortSpec = if let Some(name) = cli.ports.strip_prefix("preset:") {
+        let preset = netscan_core::preset(name)
+            .ok_or_else(|| format!("--ports: unknown preset {name:?}"))?;
+        let ports_str = preset
+            .slice()
+            .iter()
+            .map(|p| p.to_string())
+            .collect::<Vec<_>>()
+            .join(",");
+        ports_str.parse().map_err(|e| format!("--ports: {e}"))?
+    } else {
+        cli.ports.parse().map_err(|e| format!("--ports: {e}"))?
+    };
 
     let scanner = Scanner::new(targets, ports)
         .with_timeout(std::time::Duration::from_millis(cli.timeout_ms))
