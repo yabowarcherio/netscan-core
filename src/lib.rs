@@ -109,6 +109,19 @@ impl PortPreset {
     }
 }
 
+/// Look up a preset by lower-case name. Returns `None` for unknown names.
+pub fn preset(name: &str) -> Option<PortPreset> {
+    Some(match name.to_ascii_lowercase().as_str() {
+        "quick" => PortPreset::Quick,
+        "web" => PortPreset::Web,
+        "shell" => PortPreset::Shell,
+        "db" | "database" => PortPreset::Db,
+        "mail" => PortPreset::Mail,
+        "file" | "fileshare" => PortPreset::File,
+        _ => return None,
+    })
+}
+
 /// A single scan configuration.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Hash)]
 pub struct Scanner {
