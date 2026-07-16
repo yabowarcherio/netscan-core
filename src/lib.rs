@@ -10,6 +10,20 @@
 //! The crate is intentionally the *engine* — no UI, no scheduling niceties,
 //! just an async [`Scanner`] that yields [`HostResult`]s. Front-ends (Tauri,
 //! CLI, TUI) sit on top.
+//!
+//! # Example
+//!
+//! ```
+//! use netscan_core::Scanner;
+//! use cidr_utils::IpSet;
+//! use portspec::PortSpec;
+//!
+//! let targets: Vec<IpSet> = vec!["10.0.0.0/30".parse().unwrap()];
+//! let ports: PortSpec = "ssh,http,https".parse().unwrap();
+//! let s = Scanner::new(targets, ports);
+//! // 4 hosts × 3 ports.
+//! assert_eq!(s.total_probes(), 12);
+//! ```
 
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![forbid(unsafe_code)]
