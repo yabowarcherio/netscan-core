@@ -78,6 +78,37 @@ pub const MAIL_PORTS: &[u16] = &[25, 110, 143, 465, 587, 993, 995];
 /// The set of ports commonly enumerated as "file-share" services.
 pub const FILE_PORTS: &[u16] = &[20, 21, 22, 111, 139, 445, 548, 2049];
 
+/// Named port preset. See `preset()` for the string-lookup form.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum PortPreset {
+    /// [`QUICK_PORTS`].
+    Quick,
+    /// [`WEB_PORTS`].
+    Web,
+    /// [`SHELL_PORTS`].
+    Shell,
+    /// [`DB_PORTS`].
+    Db,
+    /// [`MAIL_PORTS`].
+    Mail,
+    /// [`FILE_PORTS`].
+    File,
+}
+
+impl PortPreset {
+    /// The underlying `&'static [u16]` for this preset.
+    pub const fn slice(self) -> &'static [u16] {
+        match self {
+            PortPreset::Quick => QUICK_PORTS,
+            PortPreset::Web => WEB_PORTS,
+            PortPreset::Shell => SHELL_PORTS,
+            PortPreset::Db => DB_PORTS,
+            PortPreset::Mail => MAIL_PORTS,
+            PortPreset::File => FILE_PORTS,
+        }
+    }
+}
+
 /// A single scan configuration.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Hash)]
 pub struct Scanner {
