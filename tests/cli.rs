@@ -245,6 +245,29 @@ fn wake_repeat_zero_is_treated_as_one() {
 }
 
 #[test]
+fn ports_preset_quick_parses() {
+    let (code, out, _) = run({
+        let mut c = bin();
+        c.args(["--dry-run", "10.0.0.1", "--ports", "preset:quick"]);
+        c
+    });
+    assert_eq!(code, 0);
+    // QUICK_PORTS has 4 entries, one target.
+    assert!(out.contains("planned probes: 4"), "stdout: {out}");
+}
+
+#[test]
+fn ports_preset_unknown_exits_two() {
+    let (code, _, err) = run({
+        let mut c = bin();
+        c.args(["--dry-run", "10.0.0.1", "--ports", "preset:nope"]);
+        c
+    });
+    assert_eq!(code, 2);
+    assert!(err.contains("preset"));
+}
+
+#[test]
 fn service_name_in_ports_parses() {
     let (code, out, _) = run({
         let mut c = bin();
