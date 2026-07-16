@@ -75,6 +75,9 @@ pub const DB_PORTS: &[u16] = &[1433, 3306, 5432, 6379, 27017, 9042, 9200, 11211]
 /// The set of ports commonly enumerated as "mail" services.
 pub const MAIL_PORTS: &[u16] = &[25, 110, 143, 465, 587, 993, 995];
 
+/// The set of ports commonly enumerated as "file-share" services.
+pub const FILE_PORTS: &[u16] = &[20, 21, 22, 111, 139, 445, 548, 2049];
+
 /// A single scan configuration.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Hash)]
 pub struct Scanner {
