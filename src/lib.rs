@@ -973,6 +973,15 @@ mod tests {
     }
 
     #[test]
+    fn preset_lookup_maps_names_to_slices() {
+        assert_eq!(preset("quick").map(PortPreset::slice), Some(QUICK_PORTS));
+        assert_eq!(preset("WEB").map(PortPreset::slice), Some(WEB_PORTS));
+        assert_eq!(preset("database").map(PortPreset::slice), Some(DB_PORTS));
+        assert_eq!(preset("fileshare").map(PortPreset::slice), Some(FILE_PORTS));
+        assert!(preset("nope").is_none());
+    }
+
+    #[test]
     fn mail_and_file_port_presets_look_right() {
         assert!(MAIL_PORTS.contains(&25));
         assert!(MAIL_PORTS.contains(&993));
