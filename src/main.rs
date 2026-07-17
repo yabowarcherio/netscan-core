@@ -30,8 +30,8 @@ struct Cli {
 
     /// Ports to probe (any format PortSpec accepts, incl. service names).
     ///
-    /// Also accepts a preset name via `preset:NAME` — see the CLI --help
-    /// for the full list.
+    /// Also accepts a preset name via `preset:NAME`. Known presets: `quick`,
+    /// `web`, `shell`, `db`/`database`, `mail`, `file`/`fileshare`.
     #[arg(long, short = 'p', default_value = "22,80,443,3389")]
     ports: String,
 
