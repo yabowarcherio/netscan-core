@@ -95,6 +95,12 @@ pub enum PortPreset {
     File,
 }
 
+impl std::fmt::Display for PortPreset {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.name())
+    }
+}
+
 impl PortPreset {
     /// The canonical lower-case name matching [`preset`].
     pub const fn name(self) -> &'static str {
