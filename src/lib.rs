@@ -109,6 +109,17 @@ impl PortPreset {
     }
 }
 
+/// Every named preset in the crate, in declaration order — useful for
+/// listing them in a CLI's --help output.
+pub const ALL_PRESETS: &[PortPreset] = &[
+    PortPreset::Quick,
+    PortPreset::Web,
+    PortPreset::Shell,
+    PortPreset::Db,
+    PortPreset::Mail,
+    PortPreset::File,
+];
+
 /// Look up a preset by lower-case name. Returns `None` for unknown names.
 pub fn preset(name: &str) -> Option<PortPreset> {
     Some(match name.to_ascii_lowercase().as_str() {
