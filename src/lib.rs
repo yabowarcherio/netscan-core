@@ -996,6 +996,13 @@ mod tests {
     }
 
     #[test]
+    fn preset_name_round_trips_through_lookup() {
+        for &p in ALL_PRESETS {
+            assert_eq!(preset(p.name()), Some(p));
+        }
+    }
+
+    #[test]
     fn preset_lookup_maps_names_to_slices() {
         assert_eq!(preset("quick").map(PortPreset::slice), Some(QUICK_PORTS));
         assert_eq!(preset("WEB").map(PortPreset::slice), Some(WEB_PORTS));
