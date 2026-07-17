@@ -96,6 +96,18 @@ pub enum PortPreset {
 }
 
 impl PortPreset {
+    /// The canonical lower-case name matching [`preset`].
+    pub const fn name(self) -> &'static str {
+        match self {
+            PortPreset::Quick => "quick",
+            PortPreset::Web => "web",
+            PortPreset::Shell => "shell",
+            PortPreset::Db => "db",
+            PortPreset::Mail => "mail",
+            PortPreset::File => "file",
+        }
+    }
+
     /// The underlying `&'static [u16]` for this preset.
     pub const fn slice(self) -> &'static [u16] {
         match self {
