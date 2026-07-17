@@ -119,6 +119,17 @@ impl PortPreset {
             PortPreset::File => FILE_PORTS,
         }
     }
+
+    /// The count of ports in this preset.
+    pub const fn len(self) -> usize {
+        self.slice().len()
+    }
+
+    /// `true` when the preset has zero ports (currently never — every preset
+    /// ships at least one).
+    pub const fn is_empty(self) -> bool {
+        self.slice().is_empty()
+    }
 }
 
 /// Every named preset in the crate, in declaration order — useful for
