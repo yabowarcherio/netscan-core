@@ -1014,6 +1014,14 @@ mod tests {
     }
 
     #[test]
+    fn every_preset_is_non_empty() {
+        for &p in ALL_PRESETS {
+            assert!(!p.is_empty(), "{} is empty", p.name());
+            assert_eq!(p.len(), p.slice().len());
+        }
+    }
+
+    #[test]
     fn preset_lookup_maps_names_to_slices() {
         assert_eq!(preset("quick").map(PortPreset::slice), Some(QUICK_PORTS));
         assert_eq!(preset("WEB").map(PortPreset::slice), Some(WEB_PORTS));
