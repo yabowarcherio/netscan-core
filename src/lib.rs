@@ -1028,6 +1028,13 @@ mod tests {
     }
 
     #[test]
+    fn preset_display_matches_name() {
+        for &p in ALL_PRESETS {
+            assert_eq!(p.to_string(), p.name());
+        }
+    }
+
+    #[test]
     fn preset_lookup_maps_names_to_slices() {
         assert_eq!(preset("quick").map(PortPreset::slice), Some(QUICK_PORTS));
         assert_eq!(preset("WEB").map(PortPreset::slice), Some(WEB_PORTS));
