@@ -73,11 +73,17 @@ async fn main() {
 }
 ```
 
-Preset port lists are exposed as `&'static [u16]` slices:
+Preset port lists are exposed as `&'static [u16]` slices, plus a `PortPreset`
+enum wired through the CLI as `--ports preset:NAME` (accepts
+`quick`, `web`, `shell`, `db`/`database`, `mail`, `file`/`fileshare`):
 
 ```rust
-use netscan_core::{QUICK_PORTS, WEB_PORTS, SHELL_PORTS, DB_PORTS};
+use netscan_core::{PortPreset, ALL_PRESETS, QUICK_PORTS, preset};
 assert!(QUICK_PORTS.contains(&22));
+assert_eq!(preset("web"), Some(PortPreset::Web));
+for &p in ALL_PRESETS {
+    println!("{p}: {} ports", p.len());
+}
 ```
 
 Or stream results as they come in:
