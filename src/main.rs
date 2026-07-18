@@ -149,10 +149,15 @@ fn run(cli: Cli) -> Result<(), String> {
 
     let targets = parse_targets(&cli.targets)?;
     let ports: PortSpec = if let Some(name) = cli.ports.strip_prefix("preset:") {
-        let preset = netscan_core::preset(name)
-            .ok_or_else(|| format!("--ports: unknown preset {name:?}"))?;
-        let ports_str = preset
-            .slice()
+        let ports = if name.eq_ignore_ascii_case("all") {
+            netscan_core::union_of_presets()
+        } else {
+            netscan_core::preset(name)
+                .ok_or_else(|| format!("--ports: unknown preset {name:?}"))?
+                .slice()
+                .to_vec()
+        };
+        let ports_str = ports
             .iter()
             .map(|p| p.to_string())
             .collect::<Vec<_>>()
