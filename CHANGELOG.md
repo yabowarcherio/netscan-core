@@ -14,7 +14,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Port-preset slice constants: `QUICK_PORTS`, `WEB_PORTS`, `SHELL_PORTS`,
   `DB_PORTS`, `MAIL_PORTS`, `FILE_PORTS`, plus `DEFAULT_STREAM_BUFFER`.
 - `PortPreset` enum with `slice`/`name`/`len`/`is_empty`/`Display`, plus the
-  `preset(name)` lookup, `ALL_PRESETS` array, and CLI `--ports preset:NAME`.
+  `preset(name)` lookup, `ALL_PRESETS` array, and CLI `--ports preset:NAME`
+  (accepts `preset:all` for the deduped union).
+- `union_of_presets()` combining every preset into a single deduped sorted
+  `Vec<u16>`.
 - Scanner extensions: `Scanner::empty`, `is_empty`, `with_targets`,
   `with_ports`, `push_target`, `clear_targets`, `target_count`,
   `total_addresses`, `total_ports`, `estimated_duration`.
