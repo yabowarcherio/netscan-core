@@ -1041,6 +1041,18 @@ mod tests {
     }
 
     #[test]
+    fn union_of_presets_covers_every_slice() {
+        let all = union_of_presets();
+        for &p in ALL_PRESETS {
+            for port in p.slice() {
+                assert!(all.contains(port), "{port} missing from union");
+            }
+        }
+        // Sorted.
+        assert!(all.windows(2).all(|w| w[0] < w[1]));
+    }
+
+    #[test]
     fn preset_display_matches_name() {
         for &p in ALL_PRESETS {
             assert_eq!(p.to_string(), p.name());
