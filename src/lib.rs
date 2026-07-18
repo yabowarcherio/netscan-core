@@ -149,6 +149,19 @@ pub const ALL_PRESETS: &[PortPreset] = &[
     PortPreset::File,
 ];
 
+/// Every port in every preset, deduped and sorted ascending. Roughly the
+/// "cast a wide net" scan you'd start with when you don't know what's on the
+/// network.
+pub fn union_of_presets() -> Vec<u16> {
+    let mut ports: Vec<u16> = ALL_PRESETS
+        .iter()
+        .flat_map(|p| p.slice().iter().copied())
+        .collect();
+    ports.sort_unstable();
+    ports.dedup();
+    ports
+}
+
 /// Look up a preset by lower-case name. Returns `None` for unknown names.
 pub fn preset(name: &str) -> Option<PortPreset> {
     Some(match name.to_ascii_lowercase().as_str() {
