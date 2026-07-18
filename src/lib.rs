@@ -149,6 +149,12 @@ pub const ALL_PRESETS: &[PortPreset] = &[
     PortPreset::File,
 ];
 
+/// The total count of ports across every preset (with duplicates counted
+/// once), i.e. `union_of_presets().len()` but computable at const time.
+pub fn union_port_count() -> usize {
+    union_of_presets().len()
+}
+
 /// Every port in every preset, deduped and sorted ascending. Roughly the
 /// "cast a wide net" scan you'd start with when you don't know what's on the
 /// network.
