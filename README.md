@@ -78,12 +78,14 @@ enum wired through the CLI as `--ports preset:NAME` (accepts
 `quick`, `web`, `shell`, `db`/`database`, `mail`, `file`/`fileshare`):
 
 ```rust
-use netscan_core::{PortPreset, ALL_PRESETS, QUICK_PORTS, preset};
+use netscan_core::{PortPreset, ALL_PRESETS, QUICK_PORTS, preset, union_of_presets};
 assert!(QUICK_PORTS.contains(&22));
 assert_eq!(preset("web"), Some(PortPreset::Web));
 for &p in ALL_PRESETS {
     println!("{p}: {} ports", p.len());
 }
+let all_ports = union_of_presets();
+assert!(all_ports.len() >= QUICK_PORTS.len());
 ```
 
 Or stream results as they come in:
