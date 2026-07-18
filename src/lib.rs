@@ -1047,6 +1047,11 @@ mod tests {
     }
 
     #[test]
+    fn union_port_count_matches_union_of_presets_len() {
+        assert_eq!(union_port_count(), union_of_presets().len());
+    }
+
+    #[test]
     fn union_of_presets_covers_every_slice() {
         let all = union_of_presets();
         for &p in ALL_PRESETS {
