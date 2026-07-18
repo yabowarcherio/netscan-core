@@ -245,6 +245,26 @@ fn wake_repeat_zero_is_treated_as_one() {
 }
 
 #[test]
+fn ports_preset_all_yields_more_than_quick() {
+    // preset:all is the union of every preset — it must be strictly larger
+    // than any single preset (`quick` has 4 ports).
+    let (code, out, _) = run({
+        let mut c = bin();
+        c.args(["--dry-run", "10.0.0.1", "--ports", "preset:all"]);
+        c
+    });
+    assert_eq!(code, 0);
+    // Extract "planned probes: N" and parse it.
+    let n: usize = out
+        .lines()
+        .find(|l| l.starts_with("planned probes:"))
+        .and_then(|l| l.rsplit_once(':'))
+        .map(|(_, n)| n.trim().parse::<usize>().unwrap())
+        .expect("planned probes line");
+    assert!(n > 4, "preset:all should have more than 4 ports, got {n}");
+}
+
+#[test]
 fn ports_preset_quick_parses() {
     let (code, out, _) = run({
         let mut c = bin();
