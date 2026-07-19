@@ -216,7 +216,14 @@ fn wake_repeat_requires_wake() {
     // --wake-repeat without --wake is a clap error, exit 2.
     let (code, _, err) = run({
         let mut c = bin();
-        c.args(["--dry-run", "--wake-repeat", "3", "10.0.0.1", "--ports", "22"]);
+        c.args([
+            "--dry-run",
+            "--wake-repeat",
+            "3",
+            "10.0.0.1",
+            "--ports",
+            "22",
+        ]);
         c
     });
     assert_eq!(code, 2);
@@ -229,12 +236,7 @@ fn wake_repeat_zero_is_treated_as_one() {
     // than sending nothing at all.
     let (code, _, err) = run({
         let mut c = bin();
-        c.args([
-            "--wake",
-            "aa:bb:cc:dd:ee:ff",
-            "--wake-repeat",
-            "0",
-        ]);
+        c.args(["--wake", "aa:bb:cc:dd:ee:ff", "--wake-repeat", "0"]);
         c
     });
     let is_wake_send_error = code == 2 && err.contains("wake AA:BB:CC:DD:EE:FF");

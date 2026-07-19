@@ -171,8 +171,10 @@ pub fn is_preset_port(port: u16) -> bool {
 
 /// Merge multiple presets into a single deduped, sorted `Vec<u16>`.
 pub fn merge_presets(presets: &[PortPreset]) -> Vec<u16> {
-    let mut ports: Vec<u16> =
-        presets.iter().flat_map(|p| p.slice().iter().copied()).collect();
+    let mut ports: Vec<u16> = presets
+        .iter()
+        .flat_map(|p| p.slice().iter().copied())
+        .collect();
     ports.sort_unstable();
     ports.dedup();
     ports
@@ -333,10 +335,7 @@ impl Scanner {
     /// Bounded-channel variant of [`Scanner::stream`] — drop-in with a caller
     /// picked buffer size. When the receiver falls behind, the sending tasks
     /// wait on send instead of piling up memory.
-    pub fn stream_bounded(
-        &self,
-        buffer: usize,
-    ) -> mpsc::Receiver<(SocketAddr, ProbeStatus)> {
+    pub fn stream_bounded(&self, buffer: usize) -> mpsc::Receiver<(SocketAddr, ProbeStatus)> {
         let (tx, rx) = mpsc::channel(buffer.max(1));
         let sem = Arc::new(Semaphore::new(self.concurrency));
         let timeout_dur = self.timeout;
@@ -536,9 +535,7 @@ pub fn split_by_family(results: &[HostResult]) -> (Vec<&HostResult>, Vec<&HostRe
 ///
 /// Useful for histograms — most hosts have 0 open ports, a few have 1-3,
 /// outliers have dozens.
-pub fn histogram_by_port_count(
-    results: &[HostResult],
-) -> std::collections::BTreeMap<usize, usize> {
+pub fn histogram_by_port_count(results: &[HostResult]) -> std::collections::BTreeMap<usize, usize> {
     let mut hist: std::collections::BTreeMap<usize, usize> = Default::default();
     for r in results {
         *hist.entry(r.open_ports.len()).or_insert(0) += 1;
