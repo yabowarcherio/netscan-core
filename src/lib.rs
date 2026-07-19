@@ -1070,6 +1070,15 @@ mod tests {
     }
 
     #[test]
+    fn merge_presets_dedupes_shared_ports() {
+        // Both QUICK and SHELL contain 22.
+        let m = merge_presets(&[PortPreset::Quick, PortPreset::Shell]);
+        assert!(m.contains(&22));
+        // Sorted with no duplicates.
+        assert!(m.windows(2).all(|w| w[0] < w[1]));
+    }
+
+    #[test]
     fn is_preset_port_matches_presets_containing() {
         for port in [22u16, 80, 443, 5432, 65500] {
             assert_eq!(is_preset_port(port), !presets_containing(port).is_empty());
