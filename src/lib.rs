@@ -1056,6 +1056,15 @@ mod tests {
     }
 
     #[test]
+    fn presets_containing_ssh_includes_quick_and_shell_and_file() {
+        let hits = presets_containing(22);
+        assert!(hits.contains(&PortPreset::Quick));
+        assert!(hits.contains(&PortPreset::Shell));
+        assert!(hits.contains(&PortPreset::File));
+        assert!(presets_containing(65500).is_empty());
+    }
+
+    #[test]
     fn union_port_count_matches_union_of_presets_len() {
         assert_eq!(union_port_count(), union_of_presets().len());
     }
