@@ -17,7 +17,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `preset(name)` lookup, `ALL_PRESETS` array, and CLI `--ports preset:NAME`
   (accepts `preset:all` for the deduped union).
 - `union_of_presets()` combining every preset into a single deduped sorted
-  `Vec<u16>`.
+  `Vec<u16>`; plus `union_port_count()` and `presets_containing(port)`.
 - Scanner extensions: `Scanner::empty`, `is_empty`, `with_targets`,
   `with_ports`, `push_target`, `clear_targets`, `target_count`,
   `total_addresses`, `total_ports`, `estimated_duration`.
