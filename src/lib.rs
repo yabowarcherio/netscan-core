@@ -395,12 +395,23 @@ mod tests {
     }
 
     #[tokio::test(flavor = "current_thread")]
-    async fn wake_builds_and_sends_over_udp_without_error() {
-        // Sending a broadcast to a random MAC only fails when the socket
-        // itself can't be bound — which shouldn't happen on any dev/CI box
-        // that has a loopback interface.
+    async fn wake_reaches_the_socket_layer() {
+        // The interesting invariant is that wake() gets the packet all the way
+        // to the OS socket layer without a bind/setsockopt failure. Whether
+        // the broadcast actually leaves the box depends on the CI image's
+        // routing table (GitHub's macOS runners refuse 255.255.255.255 with
+        // ENETUNREACH/EHOSTUNREACH), so those errors are treated as pass.
+        use std::io::ErrorKind;
         let res = wake([0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF]).await;
-        assert!(res.is_ok(), "wake failed: {res:?}");
+        match res {
+            Ok(()) => {}
+            Err(e)
+                if matches!(
+                    e.kind(),
+                    ErrorKind::HostUnreachable | ErrorKind::NetworkUnreachable
+                ) => {}
+            Err(e) => panic!("wake failed with unexpected IO error: {e:?}"),
+        }
     }
 
     #[test]
