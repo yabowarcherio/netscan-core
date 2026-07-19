@@ -55,14 +55,22 @@ fn bad_target_exits_two() {
 
 #[test]
 fn wake_needs_no_target() {
-    // --wake short-circuits target parsing; if the MAC is valid the wake
-    // itself succeeds on any host with a loopback (UDP broadcast to itself).
+    // --wake short-circuits target parsing; the wake itself either succeeds
+    // or fails at the OS layer with a routing error (GitHub's macOS runners
+    // refuse 255.255.255.255 broadcasts with ENETUNREACH/EHOSTUNREACH). The
+    // invariant this test cares about is that clap didn't demand a positional
+    // TARGET when --wake is set, which shows up as either exit 0 or an exit
+    // 2 whose stderr mentions unreachability — never the clap 'required'
+    // error.
     let (code, _, err) = run({
         let mut c = bin();
         c.args(["--wake", "aa:bb:cc:dd:ee:ff"]);
         c
     });
-    assert_eq!(code, 0, "stderr: {err}");
+    assert!(
+        code == 0 || (code == 2 && err.to_lowercase().contains("unreachable")),
+        "unexpected outcome (code={code}, stderr={err})"
+    );
 }
 
 #[test]
