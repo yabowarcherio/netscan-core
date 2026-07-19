@@ -1061,6 +1061,13 @@ mod tests {
     }
 
     #[test]
+    fn is_preset_port_matches_presets_containing() {
+        for port in [22u16, 80, 443, 5432, 65500] {
+            assert_eq!(is_preset_port(port), !presets_containing(port).is_empty());
+        }
+    }
+
+    #[test]
     fn presets_containing_ssh_includes_quick_and_shell_and_file() {
         let hits = presets_containing(22);
         assert!(hits.contains(&PortPreset::Quick));
