@@ -164,6 +164,11 @@ pub fn presets_containing(port: u16) -> Vec<PortPreset> {
         .collect()
 }
 
+/// `true` when `port` is in at least one preset.
+pub fn is_preset_port(port: u16) -> bool {
+    ALL_PRESETS.iter().any(|p| p.slice().contains(&port))
+}
+
 /// Every port in every preset, deduped and sorted ascending. Roughly the
 /// "cast a wide net" scan you'd start with when you don't know what's on the
 /// network.
