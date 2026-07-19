@@ -150,9 +150,18 @@ pub const ALL_PRESETS: &[PortPreset] = &[
 ];
 
 /// The total count of ports across every preset (with duplicates counted
-/// once), i.e. `union_of_presets().len()` but computable at const time.
+/// once), i.e. `union_of_presets().len()`.
 pub fn union_port_count() -> usize {
     union_of_presets().len()
+}
+
+/// Every preset that contains `port`, in declaration order.
+pub fn presets_containing(port: u16) -> Vec<PortPreset> {
+    ALL_PRESETS
+        .iter()
+        .filter(|p| p.slice().contains(&port))
+        .copied()
+        .collect()
 }
 
 /// Every port in every preset, deduped and sorted ascending. Roughly the
