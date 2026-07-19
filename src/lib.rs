@@ -169,6 +169,15 @@ pub fn is_preset_port(port: u16) -> bool {
     ALL_PRESETS.iter().any(|p| p.slice().contains(&port))
 }
 
+/// Merge multiple presets into a single deduped, sorted `Vec<u16>`.
+pub fn merge_presets(presets: &[PortPreset]) -> Vec<u16> {
+    let mut ports: Vec<u16> =
+        presets.iter().flat_map(|p| p.slice().iter().copied()).collect();
+    ports.sort_unstable();
+    ports.dedup();
+    ports
+}
+
 /// Every port in every preset, deduped and sorted ascending. Roughly the
 /// "cast a wide net" scan you'd start with when you don't know what's on the
 /// network.
