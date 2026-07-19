@@ -67,8 +67,12 @@ fn wake_needs_no_target() {
         c.args(["--wake", "aa:bb:cc:dd:ee:ff"]);
         c
     });
+    // Success is exit 0; any exit 2 whose stderr mentions the wake target
+    // (rather than clap's 'required argument') proves clap accepted the
+    // absence of TARGET. Anything else is a real regression.
+    let is_wake_send_error = code == 2 && err.contains("wake AA:BB:CC:DD:EE:FF");
     assert!(
-        code == 0 || (code == 2 && err.to_lowercase().contains("unreachable")),
+        code == 0 || is_wake_send_error,
         "unexpected outcome (code={code}, stderr={err})"
     );
 }
